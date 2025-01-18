@@ -1,6 +1,0 @@
-Hello, this is the first line in "stuff.txt" file
-this is the second line.
-Adding more content to this file.
-Appending more text here.
-Adding another line for testing
-
