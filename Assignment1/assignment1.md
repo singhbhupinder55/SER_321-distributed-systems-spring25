@@ -39,4 +39,31 @@
 
 
 
+ 
+## 2.2 Running Examples
+### Example 1: Running the Socket Server and Client  
 
+I ran the example `JavaSimpleSock2` in the `Sockets` directory.  
+The example demonstrates a TCP server-client communication where:  
+- The server is set to accept up to 3 connections.  
+- The client sends messages and numbers to the server.  
+
+**Steps:**
+1. The server (`SocketServer`) was started on AWS.  
+2. The client (`SocketClient`) was run locally with the command:  
+   `gradle SocketClient -PHost=34.226.213.4 -Pmessage="This is try for first connection" -Pnumber=1`.  
+3. The server received and processed the messages sent by the client.  
+4. I ran the client multiple times to simulate different messages and numbers.  
+
+![Result Screenshot](file:///Users/bhupindersingh/Desktop/asu/assignment1/screenshorts/JavaSimpleSock2_result.png)  
+  
+**Output Explanation:**
+- The server successfully received connections and processed the messages.
+- The client sent multiple messages as expected, and the server acknowledged each one.
+- The final output shows the completion of all connections and messages processed.  
+  
+
+
+
+### Example 2: Running the Socket Server and Client 
+### Example 3: Running the Socket Server and Client 
