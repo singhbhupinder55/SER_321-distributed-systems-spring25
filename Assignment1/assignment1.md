@@ -55,7 +55,7 @@ The example demonstrates a TCP server-client communication where:
 3. The server received and processed the messages sent by the client.  
 4. I ran the client multiple times to simulate different messages and numbers.  
 
-![Result Screenshot](/Users/bhupindersingh/Desktop/asu/assignment1/screenshorts/JavaSimpleSock2 rsult .png)  
+![Result Screenshot](file:///Users/bhupindersingh/Desktop/asu/assignment1/screenshorts/JavaSimpleSock2%20result.png)  
   
 **Output Explanation:**
 - The server successfully received connections and processed the messages.
