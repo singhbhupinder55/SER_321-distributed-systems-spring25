@@ -65,6 +65,39 @@ The example demonstrates a TCP server-client communication where:
 
 
 
-### Example 2: Running the Socket Server and Client 
+### Example 2: Running the Echo Client and Server  
+#### Setup
+In this example, we ran the Echo Client and Server program, which demonstrates a simple client-server communication using sockets. The server listens for incoming connections, and the client sends messages that the server echoes back.
+
+### Steps
+1. **Server** (`runServer` task):
+   - The server was started on AWS, listening on port 9099.
+   - Command to run the server:
+     ```bash
+     gradle runServer -Pport=9099
+     ```
+   - The server waits for incoming client connections, processes messages, and echoes them back.
+
+2. **Client** (`runClient` task):
+   - The client was run locally, connecting to the server using the `-Phost` and `-Pport` parameters. The client sends messages to the server.
+   - Command to run the client:
+     ```bash
+     gradle runClient -Phost=34.226.213.4 -Pport=9099 -Pmessage="Hello, Server!"
+     ```
+
+### Result Screenshot
+![Echo Example Screenshot](screenshots/example2.png)  
+
+### Output
+- The server waits for a connection from the client and then echoes back the messages it receives.
+- Example messages sent by the client and received by the server:
+  - **Client**: `Hello, Server!`
+  - **Server**: `Hello, Server!`
+  - **Client**: `Server, this is the last message I am sending u, i am loving this echo`
+  - **Server**: `Server, this is the last message i am sending u, i am loving this echo`
+
+The client successfully sent multiple messages, and the server echoed them back correctly.
+
+ 
 ### Example 3: Running the Socket Server and Client 
 
