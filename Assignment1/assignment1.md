@@ -99,5 +99,42 @@ In this example, we ran the Echo Client and Server program, which demonstrates a
 The client successfully sent multiple messages, and the server echoed them back correctly.
 
  
-### Example 3: Running the Socket Server and Client 
+
+### Example 3: SimpleWebServer
+
+### Objective
+
+In this example, we are running a simple web server which listens for incoming HTTP requests. It serves files such as `index.html` and `secret.txt` when requested by the client. The server works on both local and AWS environments and is accessible through the specified port (default 9099).
+
+### Steps Taken
+
+1. **Server Setup on AWS**:
+   - The SimpleWebServer was deployed on an AWS EC2 instance, listening on port 9099.
+   - It is designed to handle basic HTTP requests (HTTP/0.9 for compatibility with the client).
+
+2. **Client Setup on Local Machine**:
+   - We used the `curl` command on a local machine to test the functionality of the server.
+   - We sent HTTP GET requests for the `index.html` and `secret.txt` files.
+   
+   **Command:**
+   ```bash
+   curl -v --http0.9 http://34.226.213.4:9099/index.html  
+
+   **Server Response:**  
+- The server processes the GET request and responds with the contents of the requested file (either index.html or secret.txt).  
+
+   **ClientHandler:**   
+-  handles the incoming requests and serves the requested files (either index.html or secret.txt).
+
+3. **Testing and Results:**  
+- The server responded correctly when accessed through the local machine using curl.
+- The server also handled multiple requests for both index.html and secret.txt files, serving them as expected.
+- In Screenshot below you can see the results from the curl command executed on the local machine:
+
+### Result Screenshot
+![Example3 Screenshot](screenshots/example3.png)
+
+### Conclusion
+
+In this example, we successfully set up a basic web server using Java. We implemented a simple HTTP server that accepts client requests, processes them in separate threads, and sends back the appropriate responses. The server is capable of handling requests for files like `index.html` and `secret.txt`. We also demonstrated how to interact with the server using `curl` from both local and remote environments, showcasing the ability to fetch files from the server. This example helped us understand the fundamentals of server-client communication, HTTP request handling, and threading in Java.
 
