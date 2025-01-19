@@ -118,12 +118,12 @@ In this example, we are running a simple web server which listens for incoming H
    
    **Command:**
    ```bash
-   curl -v --http0.9 http://34.226.213.4:9099/index.html  
+   curl -v --http0.9 http://34.226.213.4:9099/index.html 
 
-   **Server Response:**  
+ **Server Response:**  
 - The server processes the GET request and responds with the contents of the requested file (either index.html or secret.txt).  
 
-   **ClientHandler:**   
+ **ClientHandler:**   
 -  handles the incoming requests and serves the requested files (either index.html or secret.txt).
 
 3. **Testing and Results:**  
