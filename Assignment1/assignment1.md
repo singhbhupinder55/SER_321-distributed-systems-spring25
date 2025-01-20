@@ -138,6 +138,14 @@ In this example, we are running a simple web server which listens for incoming H
 
 In this example, we successfully set up a basic web server using Java. We implemented a simple HTTP server that accepts client requests, processes them in separate threads, and sends back the appropriate responses. The server is capable of handling requests for files like `index.html` and `secret.txt`. We also demonstrated how to interact with the server using `curl` from both local and remote environments, showcasing the ability to fetch files from the server. This example helped us understand the fundamentals of server-client communication, HTTP request handling, and threading in Java.
 
-##2.3. Understanding Gradle
+## 2.3. Understanding Gradle
 - By clicking on the link below, you can access the JavaGradle folder in the repository, which contains the necessary files for this task.
 [JavaGradle Folder](https://github.com/singhbhupinder55/ser321-spring25-A-bsingh55/tree/master/Assignment1/JavaGradle)
+
+
+## Screencast link  for Part 2.4  
+
+- [![JavaSimpleSock2 Example](https://img.youtube.com/vi/XSS4tpjUTwY/hqdefault.jpg)](https://www.youtube.com/watch?v=XSS4tpjUTwY)  
+
+
+
