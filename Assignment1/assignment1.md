@@ -257,5 +257,5 @@ From the screenshots:
 ![is amazing!!! Packet](screenshots/IsAmazingReading.png)  
 
 3. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
-![Command-line Screenshot](screenshots/window3.2.png)  
+![Command-line Screenshot](screenshots/windows3.2.png)  
 
