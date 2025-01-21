@@ -203,7 +203,7 @@ From the graph, we can observe the fluctuations in the number of ESTABLISHED con
 The monitoring task successfully tracked the TCP socket states, and the generated graph provides a clear visualization of network activity.
 
 
-## Part 3.2 (Sniffing TCP/UDP Traffic)
+## Part 3.2 (Sniffing TCP/UDP Traffic) Step 1
 
 ### a) Explain both the commands you used in detail. What did they actually do?
 
@@ -259,3 +259,60 @@ From the screenshots:
 3. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
 ![Command-line Screenshot](screenshots/windows3.2.png)  
 
+## Step 2 (UDP) Answers
+
+### a) Explain both the commands you used in detail. What did they actually do?
+
+- **`nc -k -l -u 3333`**:  
+  This command starts a UDP server that listens on port `3333` for incoming messages. The `-k` option allows the server to stay open and continue listening for multiple connections. The `-l` option puts `nc` in listening mode (server mode), and `-u` specifies that UDP is used instead of TCP.
+
+- **`nc -u 127.0.0.1 3333`**:  
+  This command starts a UDP client that connects to the server at `127.0.0.1` (localhost) on port `3333`. The client sends the messages `SER321` and `Rocks!` to the server.
+
+### b) How many packets were needed to capture those 2 lines?
+
+- The two lines, `SER321` and `Rocks!`, required **2 UDP packets** for the data transfer. 
+- One packet for `SER321` and another for `Rocks!`.
+
+### c) How many packets were needed to capture the whole "process" (starting the communication, ending the communication)?
+
+- **4 packets** were needed for the whole process:
+  - 2 UDP packets for the data (`SER321` and `Rocks!`).
+  - 2 additional packets for control (connection management), but UDP does not have handshakes or termination like TCP, so no additional control packets are necessary.
+
+### d) How many bytes is the data (only the data) that was sent?
+
+- **`SER321`**: 7 bytes.
+- **`Rocks!`**: 6 bytes.
+- **Total data sent**: **7 bytes + 6 bytes = 13 bytes**.
+
+### e) How many total bytes went over the wire?
+
+- From the Wireshark capture:
+  - **Packet 316**: **39 bytes** (includes 7 bytes of data for `SER321` and 32 bytes of UDP header).
+  - **Packet 317**: **39 bytes** (includes 7 bytes of data for `Rocks!` and 32 bytes of UDP header).
+  - **Total bytes sent over the wire**: **39 bytes + 39 bytes = 78 bytes**.
+
+### f) How many bytes was the whole process compared to the actual data that we sent?
+
+- **Total bytes sent over the wire**: 78 bytes.
+- **Actual data sent**: 13 bytes.
+- **Overhead**: **78 bytes - 13 bytes = 65 bytes**.
+
+### g) What is the difference in relative overhead between UDP and TCP and why?
+
+- **UDP** has a small header (8 bytes) and no connection management (no SYN, ACK, or FIN packets). It sends data without establishing or tearing down a connection.
+- **TCP** includes several extra overhead packets for connection setup (SYN), acknowledgment (ACK), and connection teardown (FIN), making its overhead significantly higher than UDP.
+  - For example, a single TCP connection involves extra packets (SYN, ACK, FIN), which increases the total number of bytes sent over the wire.
+  - UDP is simpler, with minimal overhead, while TCP ensures reliability, ordering, and connection control, but at the cost of additional packet size.
+
+---
+
+### **Screenshots to Include in the Markdown File:**
+
+1. **Wireshark Capture for UDP** showing the data `SER321` and `Rocks!`:
+   
+   ![UDP Packet SER321 Capture](screenshots/ser321UDP.png)
+   ![UDP Packet ROCK Capture](screenshots/rockUDP.png)
+2. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
+   ![window Capture](screenshots/UDPwindow.png)
