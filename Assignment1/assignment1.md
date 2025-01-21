@@ -149,3 +149,54 @@ In this example, we successfully set up a basic web server using Java. We implem
 
 
 
+## TCP Network Socket Monitoring Report
+
+### Objective
+This task involves monitoring TCP network socket connections for a period of 10 minutes. The goal is to track the number of ESTABLISHED and LISTEN socket states over time using a bash script and visualize the data in a line chart.
+
+## Methodology
+
+### Data Collection
+A custom bash script was used to monitor network connections and collect the number of ESTABLISHED and LISTEN socket connections every 30 seconds. The script runs in a loop, continuously appending the current time and socket states to a file (`tcp_connections.txt`). Below is the script used for data collection:
+
+```bash
+  #!/bin/bash
+
+  # Output file
+  OUTPUT_FILE="tcp_connections.txt"
+
+  # Clear the contents of the output file at the start
+  > "$OUTPUT_FILE"
+
+  # Loop to monitor network connections every 30 seconds
+while true; do
+  # Print the current date and time for clarity
+  echo "Current Time: $(date)" >> "$OUTPUT_FILE"
+
+  # Count the number of 'ESTABLISHED' connections
+  ESTABLISHED_COUNT=$(netstat -a | grep ESTABLISHED | wc -l)
+  echo "ESTABLISHED: $ESTABLISHED_COUNT" >> "$OUTPUT_FILE"
+
+  # Count the number of 'LISTEN' connections
+  LISTEN_COUNT=$(netstat -a | grep LISTEN | wc -l)
+  echo "LISTEN: $LISTEN_COUNT" >> "$OUTPUT_FILE"
+
+  
+  # Wait for 30 seconds before checking again
+  echo "------------------------------" >> "$OUTPUT_FILE"
+ 
+done  
+
+- This script counts the ESTABLISHED and LISTEN connections using the netstat command and appends the results to tcp_connections.txt.
+
+### Graph Generation
+The collected data from the tcp_connections.txt file was imported into Excel, and a line chart was generated to visualize the socket states over the 10-minute period. The graph below represents the number of ESTABLISHED and LISTEN socket connections at each 30-second interval.
+
+## Graph of ESTABLISHED and LISTEN Socket States  
+![ESTABLISHED AND LISTEN VS TIME GRAPH](screenshots/graph.png)  
+
+### Analysis
+From the graph, we can observe the fluctuations in the number of ESTABLISHED connections, with spikes occurring at specific intervals. The number of LISTEN connections remained constant throughout the observation period.
+
+### Conclusion
+The monitoring task successfully tracked the TCP socket states, and the generated graph provides a clear visualization of network activity.
