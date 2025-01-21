@@ -146,10 +146,11 @@ In this example, we successfully set up a basic web server using Java. We implem
 ## Screencast link  for Part 2.4  
 
 - [![JavaSimpleSock2 Example](https://img.youtube.com/vi/XSS4tpjUTwY/hqdefault.jpg)](https://www.youtube.com/watch?v=XSS4tpjUTwY)  
+  
 
 
 
-## TCP Network Socket Monitoring Report
+## 3.1.  TCP Network Socket Monitoring Report
 
 ### Objective
 This task involves monitoring TCP network socket connections for a period of 10 minutes. The goal is to track the number of ESTABLISHED and LISTEN socket states over time using a bash script and visualize the data in a line chart.
@@ -169,7 +170,7 @@ A custom bash script was used to monitor network connections and collect the num
   > "$OUTPUT_FILE"
 
   # Loop to monitor network connections every 30 seconds
-while true; do
+  while true; do
   # Print the current date and time for clarity
   echo "Current Time: $(date)" >> "$OUTPUT_FILE"
 
@@ -180,14 +181,14 @@ while true; do
   # Count the number of 'LISTEN' connections
   LISTEN_COUNT=$(netstat -a | grep LISTEN | wc -l)
   echo "LISTEN: $LISTEN_COUNT" >> "$OUTPUT_FILE"
-
-  
+ 
   # Wait for 30 seconds before checking again
   echo "------------------------------" >> "$OUTPUT_FILE"
  
-done  
+done
 
-- This script counts the ESTABLISHED and LISTEN connections using the netstat command and appends the results to tcp_connections.txt.
+
+This script counts the ESTABLISHED and LISTEN connections using the netstat command and appends the results to tcp_connections.txt.
 
 ### Graph Generation
 The collected data from the tcp_connections.txt file was imported into Excel, and a line chart was generated to visualize the socket states over the 10-minute period. The graph below represents the number of ESTABLISHED and LISTEN socket connections at each 30-second interval.
