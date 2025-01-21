@@ -254,8 +254,8 @@ From the screenshots:
 ![SER321 Packet](screenshots/ser321Reading.png)  
 
 2. **Screenshot for `is amazing!!!`** (Frame 59), where you can see the packet containing the data "is amazing!!!".
-![is amazing!!! Packet](screenshot/IsAmazingReading.png)  
+![is amazing!!! Packet](screenshots/IsAmazingReading.png)  
 
 3. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
-![Command-line Screenshot](screenshot/window3.2.png)  
+![Command-line Screenshot](screenshots/window3.2.png)  
 
