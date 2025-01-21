@@ -201,3 +201,61 @@ From the graph, we can observe the fluctuations in the number of ESTABLISHED con
 
 ### Conclusion
 The monitoring task successfully tracked the TCP socket states, and the generated graph provides a clear visualization of network activity.
+
+
+## Part 3.2 (Sniffing TCP/UDP Traffic)
+
+### a) Explain both the commands you used in detail. What did they actually do?
+
+- **Command 1: `nc -k -l 3333`**  
+  This starts a TCP server that listens on port `3333`. The `-k` option allows the server to keep running and accepting multiple connections, and the `-l` option makes it listen for incoming connections.
+  
+- **Command 2: `nc 127.0.0.1 3333`**  
+  This starts a TCP client that connects to the server at `127.0.0.1` (localhost) on port `3333`. Once connected, the client sends data (`SER321` and `is amazing!!!`) to the server.
+
+### b) How many packets were sent back and forth so the client/server could send/receive these two lines?
+
+At least **6 packets** were involved in sending the two lines (`SER321` and `is amazing!!!`):
+  - 2 packets for the handshake (SYN, SYN-ACK).
+  - 2 packets for data transfer (one for `SER321` and one for `is amazing!!!`).
+  - 2 packets for connection termination (FIN, ACK).
+
+### c) How many packets were needed back and forth to capture the whole "process" (starting the communication, ending the communication, sending the lines)?
+
+**7 packets** in total:
+  - 2 packets for the connection setup (SYN, SYN-ACK).
+  - 2 packets for data transfer (one for each line sent).
+  - 2 packets for connection teardown (FIN, ACK).
+  - 1 additional packet to acknowledge the final data transfer.
+
+### d) How many bytes is the data (only the data) that was sent from the client to the server?
+
+- **`SER321`**: 7 bytes.
+- **`is amazing!!!`**: 14 bytes.
+- **Total data**: **7 + 14 = 21 bytes**.
+
+### e) How many total bytes went over the wire (back and forth) for the whole process?
+
+From the screenshots:
+- **Packet 53** (Frame 53, data: `SER321`): 63 bytes (56 bytes header + 7 bytes data).
+- **Packet 59** (Frame 59, data: `is amazing!!!`): 70 bytes (56 bytes header + 14 bytes data).
+- Total bytes for data transfer = **63 + 70 = 133 bytes**.
+
+### f) How much overhead was there? How many bytes was the whole process compared to the actual data sent?
+
+- Total bytes sent (including headers): 63 bytes (Frame 53) + 70 bytes (Frame 59) = **133 bytes**.
+- Total data sent: **21 bytes**.
+- **Overhead**: **133 bytes - 21 bytes = 112 bytes**.  
+  
+
+## Screenshots
+
+1. **Screenshot for `SER321`** (Frame 53), where you can see the packet containing the data "SER321".
+![SER321 Packet](screenshots/ser321Reading.png)  
+
+2. **Screenshot for `is amazing!!!`** (Frame 59), where you can see the packet containing the data "is amazing!!!".
+![is amazing!!! Packet](screenshot/IsAmazingReading.png)  
+
+3. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
+![Command-line Screenshot](screenshot/window3.2.png)  
+
