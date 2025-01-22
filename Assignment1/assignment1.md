@@ -318,7 +318,7 @@ From the screenshots:
    ![window Capture](screenshots/UDPwindow.png)
 
 
-## Assignment 1 - 3.3.1: Running Things Locally
+##  3.3.1: Running Things Locally
 
 ### Task Description
 In this task, I ran the JavaSimpleSock2 example locally on my computer. Both the server and client were run on `localhost`. I set up Wireshark to capture the traffic between the client and server, sent a string and integer to the server, and waited for the response. The task also required that I demonstrate this process via a short screencast.
@@ -359,7 +359,7 @@ I recorded a screencast of the process, which includes a walkthrough of the Wire
 [Watch the video here](https://youtu.be/sL_SG2SOwaY)
 
 
-## Assignment 1 - 3.3.2: Server on AWS
+##  3.3.2: Server on AWS
 
 ### Task Description
 In this task, I ran the **server on AWS** and the **client locally** on my machine. I made sure the correct IP and port were used, and that the port was open for traffic on AWS. I set up **Wireshark** to capture the traffic between the client and the server and sent data as before.
@@ -396,4 +396,46 @@ In this task, I ran the **server on AWS** and the **client locally** on my machi
 - **AWS Security Group**: I configured the security group in AWS to allow **inbound traffic on port 8888**.
 - **Wireshark Setup**: Instead of capturing traffic on `lo0` (localhost), I captured traffic on my local **network interface** (Wi-Fi or Ethernet) because the communication now happens over the internet.
 
----
+
+
+### 3.3.3. Client on AWS
+
+**Task Description**:  
+In this scenario, I tried running the **server locally** on my home computer and the **client on AWS**. This was done to check if the communication between the client and server would work as it did in the previous part when both were run locally.
+
+#### Explanation:
+- I followed the same steps as in part **3.3.2** but swapped the roles:
+  - **Server**: Running locally on my machine.
+  - **Client**: Running on AWS (using the EC2 instance’s public IP: `71.143.69.133`).
+- However, the **client command** on AWS was stuck at "processing," and no traffic appeared in **Wireshark** for the specified IP address (`71.143.69.133`) on port `8888`. This indicated that the client was not able to connect to the server.
+
+#### What Went Wrong?
+- **No connection established**: Despite running the client command on AWS, there was no successful connection to the local server. The client remained in a "processing" state, implying that the connection could not be established.
+- **No packets in Wireshark**: Even though Wireshark was set up to capture traffic between the client and the local server, no traffic was captured, indicating that the communication between the client and the server never occurred.
+
+#### Why Didn't It Work?
+1. **Network Configuration Issues**:
+   - The **AWS EC2 instance** likely couldn’t reach the **local server** due to **network configuration issues**. Since the server is running locally, it cannot be accessed from the public internet without proper **port forwarding** or **public IP routing**.
+ 
+2. **Local Firewall / NAT**:
+   - The local server might not have been reachable because of **firewall settings** on the local machine or **NAT (Network Address Translation)** issues. Local machines, especially behind routers or in private networks, cannot directly accept incoming connections from external IP addresses without proper **port forwarding**.
+
+3. **No External Access to Local Machine**:
+   - If the local server is behind a **router or firewall**, the client running on AWS (which is an external machine) would not be able to access it without setting up **port forwarding** or exposing the server via a **public IP**. 
+
+#### What is Different from Part 3.3.2?
+- In **3.3.2**, the client and server were running on the same local machine, so there were no network-related issues, and communication occurred over the `localhost` interface.
+- In **3.3.3**, since the client was on AWS and the server was running locally, the local machine had to be accessible from the public internet. This involved challenges such as ensuring proper firewall settings, port forwarding, and network configurations that were not needed in **3.3.2**.
+
+### Conclusion:
+- **No, it did not work** as expected when running the server locally and the client on AWS. 
+- The key difference lies in the **networking**—for a client to communicate with a server across different networks (local machine vs AWS), you need to ensure proper configuration like **public IP access**, **port forwarding**, and **firewall adjustments**. Without these, the client cannot connect to the server, as seen in this case.
+
+### Screenshots:
+1. **Command Line for AWS Client And Server Running Locally Command**:
+   ![AWS Client Command And Local Server](screenshots/commandline3.3.3.png)
+
+2. **Wireshark Capture Showing No Traffic**:
+   ![Wireshark No Traffic](screenshots/wireshark3.3.3.png)
+
+
