@@ -433,9 +433,9 @@ In this scenario, I tried running the **server locally** on my home computer and
 
 ### Screenshots:
 1. **Command Line for AWS Client And Server Running Locally Command**:
-   ![AWS Client Command And Local Server](screenshots/commandline3.3.3.png)
+   ![AWS Client Command And Local Server](screenshots/wireshark3.3.3.png)
 
 2. **Wireshark Capture Showing No Traffic**:
-   ![Wireshark No Traffic](screenshots/wireshark3.3.3.png)
+   ![Wireshark No Traffic](screenshots/commandline3.3.3.png)
 
 
