@@ -358,3 +358,42 @@ I recorded a screencast of the process, which includes a walkthrough of the Wire
 **Screencast Link:**
 [Watch the video here](https://youtu.be/sL_SG2SOwaY)
 
+
+## Assignment 1 - 3.3.2: Server on AWS
+
+### Task Description
+In this task, I ran the **server on AWS** and the **client locally** on my machine. I made sure the correct IP and port were used, and that the port was open for traffic on AWS. I set up **Wireshark** to capture the traffic between the client and the server and sent data as before.
+
+### Steps Followed:
+1. **Set up the server on AWS**:
+   - I launched an EC2 instance on AWS and configured the **security group** to allow inbound traffic on port `8888`.
+   - I installed **Java** and **Gradle** on the EC2 instance and uploaded the project files.
+   - I ran the server on AWS using the command:
+     ```bash
+     gradle SockServer
+     ```
+
+2. **Run the client locally**:
+   - I ran the client on my local machine, pointing to the **AWS public IP** (`34.226.213.4`):
+     ```bash
+     gradle SockClient -Phost=34.226.213.4 -Pmessage="Hello AWS" -Pnumber=42
+     ```
+
+3. **Wireshark Setup**:
+   - I used the Wireshark filter `ip.addr == 34.226.213.4 && tcp.port == 8888` to capture the traffic between the client and the server. Wireshark captured the communication over the internet, not just locally.
+
+### Screenshots:
+1. **Server on AWS And Client on Local Machine**:
+- On left you can see the Local Machine and on the Right you can see the AWS in the screenshot
+   ![Server on AWS And Client on Local Machine](screenshots/commandline3.3.2.png)
+
+2. **Wireshark Traffic Capture**:
+- In this screenshot, you can see the wireshark network traffic Capture
+   ![Wireshark Capture](screenshots/wireshark3.3.2.png)
+
+### Changes Compared to Running Locally:
+- **AWS IP Address**: The client is now connecting to the server using the **public IP** of the AWS EC2 instance instead of `localhost`.
+- **AWS Security Group**: I configured the security group in AWS to allow **inbound traffic on port 8888**.
+- **Wireshark Setup**: Instead of capturing traffic on `lo0` (localhost), I captured traffic on my local **network interface** (Wi-Fi or Ethernet) because the communication now happens over the internet.
+
+---
