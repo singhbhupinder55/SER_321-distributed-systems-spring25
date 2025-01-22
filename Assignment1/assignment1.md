@@ -31,7 +31,7 @@
 23: **echo "bsingh55: This is a great assignment, Jan 18th 2025" >> logs_snapshot.txt** (Appends your asurite and date to the logs_snapshot.txt file)  
 24: **less logs.txt** (Reads the logs.txt file using the less command)  
 25: **cut -d% -f1 marks.csv > student_names.txt** (Extracts the student names from the marks.csv file and saves them to student_names.txt)  
-26: **cut -d% -f3 marks.csv | sort** (Extracts and sorts the marks from subject_3 in marks.csv)  
+26: **cut -d% -f3 marks.csv | sort > subject_3_sorted.txt** (Extracts and sorts the marks from subject_3 in marks.csv and save them to subject_3_sorted.txt)  
 27: **awk -F% '{sum+=$2} END {print sum/NR}' marks.csv** (Calculates and prints the average marks from subject_2 in the marks.csv file.)  
 28: **echo "average" > done.txt** (Saves the average marks from subject_2 into a new file done.txt)  
 29: **mv done.txt final/** (Moves done.txt to the final directory)  
