@@ -398,22 +398,22 @@ In this task, I ran the **server on AWS** and the **client locally** on my machi
 
 
 
-### 3.3.3. Client on AWS
+## 3.3.3. Client on AWS
 
 **Task Description**:  
 In this scenario, I tried running the **server locally** on my home computer and the **client on AWS**. This was done to check if the communication between the client and server would work as it did in the previous part when both were run locally.
 
-#### Explanation:
+### Explanation:
 - I followed the same steps as in part **3.3.2** but swapped the roles:
   - **Server**: Running locally on my machine.
   - **Client**: Running on AWS (using the EC2 instance’s public IP: `71.143.69.133`).
 - However, the **client command** on AWS was stuck at "processing," and no traffic appeared in **Wireshark** for the specified IP address (`71.143.69.133`) on port `8888`. This indicated that the client was not able to connect to the server.
 
-#### What Went Wrong?
+### What Went Wrong?
 - **No connection established**: Despite running the client command on AWS, there was no successful connection to the local server. The client remained in a "processing" state, implying that the connection could not be established.
 - **No packets in Wireshark**: Even though Wireshark was set up to capture traffic between the client and the local server, no traffic was captured, indicating that the communication between the client and the server never occurred.
 
-#### Why Didn't It Work?
+### Why Didn't It Work?
 1. **Network Configuration Issues**:
    - The **AWS EC2 instance** likely couldn’t reach the **local server** due to **network configuration issues**. Since the server is running locally, it cannot be accessed from the public internet without proper **port forwarding** or **public IP routing**.
  
@@ -423,7 +423,7 @@ In this scenario, I tried running the **server locally** on my home computer and
 3. **No External Access to Local Machine**:
    - If the local server is behind a **router or firewall**, the client running on AWS (which is an external machine) would not be able to access it without setting up **port forwarding** or exposing the server via a **public IP**. 
 
-#### What is Different from Part 3.3.2?
+### What is Different from Part 3.3.2?
 - In **3.3.2**, the client and server were running on the same local machine, so there were no network-related issues, and communication occurred over the `localhost` interface.
 - In **3.3.3**, since the client was on AWS and the server was running locally, the local machine had to be accessible from the public internet. This involved challenges such as ensuring proper firewall settings, port forwarding, and network configurations that were not needed in **3.3.2**.
 
@@ -439,3 +439,35 @@ In this scenario, I tried running the **server locally** on my home computer and
    ![Wireshark No Traffic](screenshots/commandline3.3.3.png)
 
 
+## 3.3.4. Client on AWS 2
+
+### Task Description:
+In this task, we explore why it is easier to reach a server on AWS using a client running in the local network compared to running a client from AWS trying to access a server in a local network. The task also explores the differences in local IP addresses and how to enable external access to a local server.
+
+### 1. Explanation of Local IP Addresses and Routers:
+- **Local IP Address**: Devices on a local network (e.g., home network) get a unique private IP address (e.g., `192.168.x.x`, `10.x.x.x`). These addresses are used for communication within the local network.
+- **Router's Role**: A router connects your private network to the public internet. It uses **Network Address Translation (NAT)** to map the local IPs to the public IP address assigned by the ISP. This allows local devices to access the internet but prevents direct inbound connections unless configured.
+
+### 2. Why Can You Easily Reach Your Server on AWS with a Client Running Locally:
+- When the **client is on AWS** and the **server is local**, the AWS client can easily connect to the local server because the AWS instance has a **public IP** that is reachable from anywhere over the internet. 
+- The local machine is behind a router, but the server is reachable as long as you provide the **public IP** of the local machine (if port forwarding is set up).
+
+### 3. Why is It Difficult to Reach the Local Server from AWS or External Networks:
+- When trying to reach a **local server** from AWS or an external network, the router blocks the incoming connections because it does not know how to route traffic from the internet to the local network without port forwarding.
+- The **local machine** uses a **private IP** and is not directly accessible from the internet. The router only allows **outgoing traffic** from the local network, but without **port forwarding**, external devices like the AWS client cannot connect.
+
+### 4. What Can You Do to Reach Your Local Server from Outside Your Network:
+- To allow external access to a local server, you must **set up port forwarding** on your router. This involves mapping a specific port on your public IP to the local IP of the server within your private network.
+- Another option is to set up a **VPN** to create a secure connection between the local network and external devices.
+- If you have a **static public IP address**, you can use it to access your local server from anywhere, provided the correct ports are forwarded.
+
+### 5. The Issue of Running a Server Locally and Reaching It from the Outside World:
+- The primary issue with running a **local server** and trying to reach it from the **outside world** is that local devices are behind a **NAT router**. The router does not forward traffic to the local device unless port forwarding is specifically set up.
+- **Firewalls** on either the router or the local device may block incoming connections, which adds additional complexity when trying to connect from external sources.
+
+### Conclusion:
+It is easier for an **AWS client** to reach a **server on AWS** since both the client and server have **public IPs** that are directly accessible. However, for a **local server**, the connection requires configuring **port forwarding** on the router and ensuring that the firewall allows the incoming traffic. Without these configurations, reaching the local server from the outside is not feasible. 
+
+In **3.3.2**, I shared a screenshot demonstrating that the local server was not reachable from AWS, which highlights the challenge of connecting to a local server from an external network without proper configuration.
+
+---
