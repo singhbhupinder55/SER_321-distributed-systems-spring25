@@ -316,3 +316,45 @@ From the screenshots:
    ![UDP Packet ROCK Capture](screenshots/rockUDP.png)
 2. **Command-line screenshot** showing both the server and client commands being run and how the data is being typed into the client.
    ![window Capture](screenshots/UDPwindow.png)
+
+
+## Assignment 1 - 3.3.1: Running Things Locally
+
+### Task Description
+In this task, I ran the JavaSimpleSock2 example locally on my computer. Both the server and client were run on `localhost`. I set up Wireshark to capture the traffic between the client and server, sent a string and integer to the server, and waited for the response. The task also required that I demonstrate this process via a short screencast.
+
+### Commands Used:
+1. **Start the server** (Server listens on port 8888):
+   ```bash
+   gradle SockServer 
+     ```
+2. **Start the client** (Client sends a message and number to the server):  
+   ```bash
+   gradle SockClient -Phost=localhost -Pmessage="Hello Server" -Pnumber=42
+    ```
+3. **Wireshark Filter:**  
+-  Filter used: tcp.port == 8888  
+-  This filter was used to capture the traffic between the server and the client on port 8888.  
+
+4. **Screeshots of Command-line and WireShark**  
+
+   ![Command-Line Capture](screenshots/commandline3.3.1.png)
+   ![WirkShark Capture](screenshots/wireshark3.3.1.png)  
+
+
+  **Explanation of the Traffic:**
+- In the Wireshark traffic capture, you will notice several packets. These packets show the communication between the client and server, specifically the transmission of the message and integer. The key elements in the packet are:
+
+  - PSH (Push Flag): This flag indicates that the data should be passed to the application immediately.
+  - ACK (Acknowledgment Flag): This flag confirms receipt of the data.
+  - SEQ (Sequence Number): A sequence number assigned to each byte of data in the stream.
+  - Len (Length): Indicates the length of the data in the packet.
+- The client sends the string "Hello Server" and the number 42 to the server. The server receives this data and sends an acknowledgment back, confirming the receipt of the message and integer.
+
+### Screencast
+
+I recorded a screencast of the process, which includes a walkthrough of the Wireshark capture and shows where the string and integer are sent to the server and where the response can be found.
+
+**Screencast Link:**
+[Watch the video here](https://youtu.be/sL_SG2SOwaY)
+
