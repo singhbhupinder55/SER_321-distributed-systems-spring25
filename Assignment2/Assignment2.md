@@ -7,7 +7,7 @@
 - **Purpose**: Retrieves all public repositories owned by the user `amehlhase316`.
 - **Information Provided**: The GitHub username (`amehlhase316`) is provided in the URL.
 - **Example Output**: JSON containing repository details such as `id`, `name`, `full_name`, `description`, etc.
-- **Screenshot**: ![List Repositories Screenshot](/screenshots2/repos.png)
+- **Screenshot**: ![List Repositories Screenshot](screenshots2/repos.png)
 - **Documentation**: [GitHub API - List repositories for a user](https://docs.github.com/en/rest/repos/repos#list-repositories-for-a-user)
 
 ---
@@ -17,7 +17,7 @@
 - **Purpose**: Retrieves detailed information about the repository `memoranda` owned by the user `amehlhase316`.
 - **Information Provided**: The username (`amehlhase316`) and repository name (`memoranda`) in the URL.
 - **Example Output**: JSON containing repository details like `full_name`, `language`, `default_branch`, `forks_count`, `license`, and more.
-- **Screenshot**: ![Get Specific Repository Screenshot](/screenshots2/memoranda.png)
+- **Screenshot**: ![Get Specific Repository Screenshot](screenshots2/memoranda.png)
 - **Documentation**: [GitHub API - Get a repository](https://docs.github.com/en/rest/repos/repos#get-a-repository)
 
 ---
@@ -27,7 +27,7 @@
 - **Purpose**: Retrieves all commits on the default branch (`master`) of the repository `memoranda`.
 - **Information Provided**: The username (`amehlhase316`) and repository name (`memoranda`) in the URL.
 - **Example Output**: JSON containing commit details such as `sha`, `author`, `message`, and `url`.
-- **Screenshot**: ![List Commits Screenshot](/screenshots/commits.png)
+- **Screenshot**: ![List Commits Screenshot](screenshots/commits.png)
 - **Documentation**: [GitHub API - List commits](https://docs.github.com/en/rest/commits/commits#list-commits)
 
 ---
@@ -39,7 +39,7 @@
   - `sha=master`: Specifies the branch (`master`).
   - `per_page=40`: Sets the maximum number of commits returned to 40.
 - **Example Output**: Similar to the previous call but limited to 40 commits.
-- **Screenshot**: ![List Commits with Query Parameters Screenshot](/screenshots2/masterBranch.png)
+- **Screenshot**: ![List Commits with Query Parameters Screenshot](screenshots2/masterBranch.png)
 - **Documentation**: [GitHub API - List commits](https://docs.github.com/en/rest/commits/commits#list-commits)
 
 ---
@@ -49,7 +49,7 @@
 - **Purpose**: Retrieves all contributors to the `memoranda` repository along with their contribution count.
 - **Information Provided**: The username (`amehlhase316`) and repository name (`memoranda`) in the URL.
 - **Example Output**: JSON containing contributor details like `login`, `id`, `avatar_url`, and `contributions`.
-- **Screenshot**: ![List Contributors Screenshot](/screenshots2/contributor.png)
+- **Screenshot**: ![List Contributors Screenshot](screenshots2/contributor.png)
 - **Documentation**: [GitHub API - List contributors](https://docs.github.com/en/rest/repos/repos#list-repository-contributors)
 
 ---
