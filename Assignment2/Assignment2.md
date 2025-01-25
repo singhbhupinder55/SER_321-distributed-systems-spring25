@@ -54,6 +54,16 @@
 
 ---
 
+### **Consolidated List of URLs**
+- `https://api.github.com/users/amehlhase316/repos`
+- `https://api.github.com/repos/amehlhase316/memoranda`
+- `https://api.github.com/repos/amehlhase316/memoranda/commits`
+- `https://api.github.com/repos/amehlhase316/memoranda/commits?sha=master&per_page=40`
+- `https://api.github.com/repos/amehlhase316/memoranda/contributors`
+
+---
+
+
 ## **Stateless vs. Stateful Communication**
 
 ### **Stateless Communication**
