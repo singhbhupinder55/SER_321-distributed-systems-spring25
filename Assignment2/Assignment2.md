@@ -82,3 +82,70 @@
 - Each request includes all necessary details (e.g., API tokens, query parameters) for the server to process it independently.
 
 ---
+
+# Task 2
+
+## Part 2.2: Running a Simple Java WebServer
+
+## **Setting Up the WebServer**
+
+- **Server Public IP**: `34.226.213.4`
+- **Port**: `9000`
+
+The WebServer was successfully launched on the second machine (AWS) and made accessible using the public IP address and port `9000`. Below are the results of testing different GET requests.
+
+---
+
+### **GET Requests and Outputs**
+
+#### **1. Main Page**
+- **URL**: `http://34.226.213.4:9000`
+- **Purpose**: Displays the available GET requests and file structure within the server.
+- **Screenshot**: ![Main Page Screenshot](screenshots2/main.png)
+
+#### **2. Random Page**
+- **URL**: `http://34.226.213.4:9000/random`
+- **Purpose**: Serves the `index.html` file with the bread image.
+- **Screenshot**: ![Random Page Screenshot](screenshots2/random.png)
+
+#### **3. JSON Response**
+- **URL**: `http://34.226.213.4:9000/json`
+- **Purpose**: Returns a JSON object derived from the `/random` request.
+- **Output**:
+  ```json
+  {
+    "header": "streets",
+    "image": "https://iili.io/JVlpSV.jpg"
+  }
+  ```
+- **Screenshot**: ![JSON Response Screenshot](screenshots2/json.png)
+
+#### **4. Index File**
+- **URL**: `http://34.226.213.4:9000/file/www/index.html`
+- **Purpose**: Displays the `index.html` file content.
+- **Screenshot**: ![Index File Screenshot](screenshots2/index.png)
+
+#### **5. Root File**
+- **URL**: `http://34.226.213.4:9000/file/www/root.html`
+- **Purpose**: Displays the `root.html` file content.
+- **Screenshot**: ![Root File Screenshot](screenshots2/root.png)
+
+---
+
+### **AWS Server Console Output**
+
+#### **1. Server Running Logs**
+- The AWS console confirms the server is running and processing requests as expected.
+- **Screenshot**:
+  - ![AWS Console 1](screenshots2/aws1.1.png)
+  - ![AWS Console 2](screenshots2/aws1.2.png)
+
+---
+
+## **Conclusion**
+- The WebServer successfully processed all requests, and outputs were as expected.
+- Screenshots for the web browser and server console validate the successful completion of Task 2.2.
+
+---
+
+**Next Steps**: Proceed to Task 2.3 as outlined in the assignment.
