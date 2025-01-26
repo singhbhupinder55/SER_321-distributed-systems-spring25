@@ -148,4 +148,49 @@ The WebServer was successfully launched on the second machine (AWS) and made acc
 
 ---
 
-**Next Steps**: Proceed to Task 2.3 as outlined in the assignment.
+## 2.3 Analyze What Happens
+
+### Wireshark Screenshot
+![Wireshark Screenshot](screenshots2/wireshark2.3.png)
+
+### 1. What filter did you use? Explain why you chose that filter.
+**Filter used:** `tcp.port == 9000`  
+**Explanation:** This filter ensures that only the traffic going to and from the web server on port 9000 is captured, as the web server is configured to listen on this port for HTTP requests.
+
+### 2. What happens when you are on the `/random` page and click the "Random" button? Compare this to refreshing your browser.
+- **Clicking the "Random" button:** When you click the "Random" button, the server processes the `/random` endpoint again, and the image displayed alternates between "bread" and "streets."  
+- **Refreshing the browser on `/random`:** Similarly, Refreshing causes the server to reprocess the `/random` endpoint, resulting in the display of random content. For example:
+  - The first refresh showed "bread."
+  - The second refresh showed "streets."
+
+### 3. What types of response codes are you able to receive through different requests to your server?
+
+1. **200 (OK):**  
+   This response is returned for valid requests where the server successfully processes and responds. For example:
+   - Accessing `/random`, `/json`,etc., returns a 200 status because these are valid endpoints.
+
+2. **400 (Bad Request):**  
+   This response occurs if a request is malformed or missing required parameters. For example:
+   - If a GET request to `/multiply` or `/github` is made without the expected query parameters, the server should return a 400 status.
+
+3. **404 (Not Found):**  
+   This response is returned when the requested resource or endpoint does not exist. For example:
+   - Accessing a URL like `/nonexistent` or a misspelled endpoint will return a 404 status because the server cannot find the requested resource.
+
+### 4. Explain the response codes you receive and why you get them.
+- **200 OK:** This response is received when a valid request is processed successfully by the server (e.g., accessing `/random` or `/json`).  
+- **400 Bad Request:** This occurs when the request is malformed or contains invalid parameters.  
+- **404 Not Found:** This is returned when a request is made to a non-existent resource or endpoint (e.g., a typo in the URL).
+
+### 5. When you do a `<publicIP>:9000`, take a look at what Wireshark generates as a server response. Are you able to find the data that the server sends back to you?
+**Observation:** Yes, the "Data" section of the server response in Wireshark contains the HTML content sent by the server. This plain text data corresponds to what is displayed in the browser.
+
+### 6. Based on the previous question, explain why HTTPS is now more common than HTTP.
+**Explanation:** HTTPS is more secure as it encrypts the data transmitted between the client and the server, ensuring privacy and preventing interception by unauthorized parties. HTTP, on the other hand, transmits data in plain text, which makes it vulnerable to eavesdropping and attacks.
+
+### 7. In our case - what port does the server listen to for HTTP requests, and is that the most common port for HTTP?
+**Port used:** 9000.  
+**Explanation:** While port 9000 is used for this specific setup, the most common port for HTTP traffic is port 80.
+
+### 8. Which local port is used when sending different requests to the WebServer?
+**Observation:** Local ports are dynamically allocated by the operating system. For example, during the test, ports like 60171, 60172, 60177, 60178 and 60180  were observed in the captured packets.
