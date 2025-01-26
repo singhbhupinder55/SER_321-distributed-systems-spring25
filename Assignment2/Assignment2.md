@@ -27,7 +27,7 @@
 - **Purpose**: Retrieves all commits on the default branch (`master`) of the repository `memoranda`.
 - **Information Provided**: The username (`amehlhase316`) and repository name (`memoranda`) in the URL.
 - **Example Output**: JSON containing commit details such as `sha`, `author`, `message`, and `url`.
-- **Screenshot**: ![List Commits Screenshot](screenshots/commits.png)
+- **Screenshot**: ![List Commits Screenshot](screenshots2/commits.png)
 - **Documentation**: [GitHub API - List commits](https://docs.github.com/en/rest/commits/commits#list-commits)
 
 ---
@@ -194,3 +194,28 @@ The WebServer was successfully launched on the second machine (AWS) and made acc
 
 ### 8. Which local port is used when sending different requests to the WebServer?
 **Observation:** Local ports are dynamically allocated by the operating system. For example, during the test, ports like 60171, 60172, 60177, 60178 and 60180  were observed in the captured packets.
+
+### 2.4 Setting up a "real" WebServer
+
+#### Deliverables:
+
+1. **What is the URL that you can now use to reach the main page?**
+   - The URL to access the main page is: `http://34.226.213.4`
+
+2. **Check the traffic to your WebServer. What port is the traffic going to now? Is it the same as before, or is it (and should it) be different?**
+   - The traffic is now going to **port 80**. This is different from before, as the original traffic was routed to **port 9000**. This change is expected because NGINX is configured to listen on port 80 and forward the requests to the Java server on port 9000.
+
+3. **Is it still using HTTP, or is it now using HTTPS? Why?**
+   - The traffic is still using **HTTP**. This is because the NGINX configuration is currently set up for HTTP only, and HTTPS requires additional steps such as setting up SSL certificates, which have not been done yet.
+
+4. **Could you change your security settings on AWS now?**
+   - Yes, the security settings on AWS can now be updated to **remove port 9000** from being open, as NGINX is acting as a reverse proxy and handles all traffic through port 80.
+
+5. **Take a screenshot of your web browser, your second machine, and the port number on Wireshark.**
+#### Screenshot of Wireshark for traffic on port 80:
+![Wireshark Capture](screenshots2/wireshark2.4.png)
+
+#### Screenshot of Web Browser showing the main page:
+![Web Browser Main Page](screenshots2/directWindow.png)
+
+---
