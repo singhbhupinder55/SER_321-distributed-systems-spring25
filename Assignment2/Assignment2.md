@@ -296,7 +296,8 @@ http://localhost:9000/multiply?num1=5&num2=7
 - **HTTP Status:** 200 OK
 
 ### Missing Parameters:
-```http://localhost:9000/multiply?num1=5
+```
+http://localhost:9000/multiply?num1=5
 ```
 - **Response:** "Missing parameters: num1 and num2 are required."
 - **HTTP Status:** 400 Bad Request
