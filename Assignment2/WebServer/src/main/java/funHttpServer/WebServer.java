@@ -25,6 +25,9 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+import org.json.JSONArray; // Added for JSON parsing
+import org.json.JSONObject; // Added for JSON parsing
+
 
 class WebServer {
   public static void main(String args[]) {
@@ -250,15 +253,57 @@ class WebServer {
 
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
 
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Check the todos mentioned in the Java source file");
+          if (!query_pairs.containsKey("query")) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n\n");
+            builder.append("<html>Missing 'query' parameter.</html>");
+          } else {
+          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
+         // System.out.println(json);
+
+            if (json == null || json.isEmpty()) {
+              builder.append("HTTP/1.1 500 Internal Server Error\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n\n");
+              builder.append("<html>Failed to fetch data from GitHub API.</html>");
+            } else {
+              try {
+                // Parse the JSON response
+                JSONArray repos = new JSONArray(json); // Parsing JSON Array
+                 builder.append("HTTP/1.1 200 OK\n");
+                 builder.append("Content-Type: text/html; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("Check the todos mentioned in the Java source file");
           // TODO: Parse the JSON returned by your fetch and create an appropriate
           // response based on what the assignment document asks for
+                builder.append("<html><body>");
+                builder.append("<h1>GitHub Repositories</h1>");
+                builder.append("<ul>");
+
+                // Loop through repositories and extract required details
+                for (int i = 0; i < repos.length(); i++) {
+                  JSONObject repo = repos.getJSONObject(i);
+                  String fullName = repo.getString("full_name");
+                  int id = repo.getInt("id");
+                  String login = repo.getJSONObject("owner").getString("login");
+
+                  builder.append("<li>");
+                  builder.append("Full Name: ").append(fullName).append("<br>");
+                  builder.append("ID: ").append(id).append("<br>");
+                  builder.append("Login: ").append(login);
+                  builder.append("</li>");
+                }
+
+                builder.append("</ul>");
+                builder.append("</body></html>");
+              } catch (Exception e) {
+                builder.append("HTTP/1.1 500 Internal Server Error\n");
+                builder.append("Content-Type: text/html; charset=utf-8\n\n");
+                builder.append("<html>Error parsing GitHub API response.</html>");
+              }
+            }
+          }
+          response = builder.toString().getBytes();
 
         } else {
           // if the request is not recognized at all
@@ -267,10 +312,9 @@ class WebServer {
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
           builder.append("I am not sure what you want me to do...");
+          // Output
+          response = builder.toString().getBytes();
         }
-
-        // Output
-        response = builder.toString().getBytes();
       }
     } catch (IOException e) {
       e.printStackTrace();
