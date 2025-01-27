@@ -195,7 +195,7 @@ The WebServer was successfully launched on the second machine (AWS) and made acc
 ### 8. Which local port is used when sending different requests to the WebServer?
 **Observation:** Local ports are dynamically allocated by the operating system. For example, during the test, ports like 60171, 60172, 60177, 60178 and 60180  were observed in the captured packets.
 
-### 2.4 Setting up a "real" WebServer
+## 2.4 Setting up a "real" WebServer
 
 #### Deliverables:
 
@@ -219,3 +219,31 @@ The WebServer was successfully launched on the second machine (AWS) and made acc
 ![Web Browser Main Page](screenshots2/directWindow.png)
 
 ---
+## 2.5 Setting up HTTPS
+
+### Deliverable 1: What port is your traffic going through now?
+The traffic is now going through **port 443**, as observed in the Wireshark capture. This is the default port for HTTPS traffic.
+
+### Deliverable 2: Can you still find the plain text responses that were found with HTTP?
+No, the plain text responses are no longer visible. All traffic is now encrypted due to the implementation of HTTPS, as confirmed by the secure connection shown in the browser and the encrypted packets in Wireshark.
+
+### Screenshots:
+1. **Web Browser Screenshot with HTTPS**  
+   ![HTTPS Web Browser Screenshot](screenshots2/https2.5.png)
+
+2. **Web Browser Screenshot for Random Endpoint with Secure Connection**  
+   ![HTTPS Random Endpoint](screenshots2/httpsRandom2.5.png)
+
+3. **Terminal Screenshot with Certbot Setup and FunWebServer Logs**  
+   ![HTTPS Terminal Logs](screenshots2/httpsTerminal.png)
+
+4. **Wireshark Screenshot Showing HTTPS Traffic on Port 443**  
+   ![Wireshark HTTPS Capture](screenshots2/httpsWireshark2.5.png)
+
+### Notes:
+- The browser screenshots confirm the secure connection to `https://bsingh55.duckdns.org`.
+- The FunWebServer logs show successful communication with HTTPS.
+- Wireshark confirms encrypted communication over port 443.
+
+Everything has been configured as per the assignment requirements, and HTTPS is successfully enabled.
+
