@@ -247,3 +247,67 @@ No, the plain text responses are no longer visible. All traffic is now encrypted
 
 Everything has been configured as per the assignment requirements, and HTTPS is successfully enabled.
 
+## 2.6.1 Multiply
+
+## Implementation Explanation
+The `/multiply` endpoint was implemented to handle two parameters: `num1` and `num2`. Error handling was added to ensure that invalid or missing parameters do not crash the server and that the responses are meaningful and appropriate. The following changes were made:
+
+1. **Error Handling for Missing Parameters**:
+   - If either `num1` or `num2` is missing from the query string, the server responds with:
+     - **HTTP 400 Bad Request**
+     - A message: `"Missing parameters: num1 and num2 are required."`
+   - This was implemented to handle incomplete requests where one or both parameters are not provided.
+
+2. **Error Handling for Non-Integer Inputs**:
+   - If the values of `num1` or `num2` are not integers, the server responds with:
+     - **HTTP 406 Not Acceptable**
+     - A message: `"Invalid input: num1 and num2 must be integers."`
+   - This ensures that the server can handle unexpected data types gracefully.
+
+3. **Successful Requests**:
+   - When valid integers are provided for `num1` and `num2`, the server performs the multiplication and responds with:
+     - **HTTP 200 OK**
+     - The result of the multiplication in the body: `"Result is: <value>"`
+
+---
+
+## HTTP Status Codes Used
+1. **HTTP 200 OK**:
+   - Used for valid requests where both `num1` and `num2` are provided as integers.
+   - Indicates that the operation was successful.
+
+2. **HTTP 400 Bad Request**:
+   - Used when either or both parameters (`num1`, `num2`) are missing.
+   - Chosen because the request cannot be processed without the required parameters.
+
+3. **HTTP 406 Not Acceptable**:
+   - Used when `num1` or `num2` is not a valid integer.
+   - Chosen to indicate that the server cannot process the input due to an unacceptable format.
+
+---
+
+## Example URLs for Testing
+
+### Valid Request:
+```text
+http://localhost:9000/multiply?num1=5&num2=7
+```
+- **Response:** "Result is: 35"
+- **HTTP Status:** 200 OK
+
+### Missing Parameters:
+```http://localhost:9000/multiply?num1=5
+```
+- **Response:** "Missing parameters: num1 and num2 are required."
+- **HTTP Status:** 400 Bad Request
+
+### Invalid Input (Non-Integer):
+```
+http://localhost:9000/multiply?num1=5.5&num2=7
+```
+- **Response:** "Invalid input: num1 and num2 must be integers."
+- **HTTP Status:** 406 Not Acceptable
+
+---
+
+
