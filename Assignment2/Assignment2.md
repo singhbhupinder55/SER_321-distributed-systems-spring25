@@ -362,3 +362,104 @@ The following error codes were implemented:
 
 ### Conclusion:
 The web server is designed to handle a wide range of inputs robustly, ensuring it does not crash under unexpected or invalid requests. All requested error codes were tested and are functioning as intended.
+
+
+## 2.6.3 Make Your Own Requests
+
+### Implemented Request Types
+
+#### 1. Distance Calculation
+**Endpoint**: `/distance`  
+**Description**: Calculates the Euclidean distance between two points `(x1, y1)` and `(x2, y2)`.  
+**Parameters**:
+- `x1` (numeric, required)
+- `y1` (numeric, required)
+- `x2` (numeric, required)
+- `y2` (numeric, required)
+
+**Test Cases**:
+1. **Valid Input**  
+   - **URL**: `http://localhost:9000/distance?x1=0&y1=0&x2=3&y2=4`  
+   - **Expected Output**:  
+     - **Browser**: `200 OK`, Distance: `5.0`  
+     - **Wireshark**: Confirmed `200 OK` with payload.
+   - **Screenshot**:  
+     - ![Distance Valid](screenshots2/dvalid2.6.3.png)  
+     - ![Wireshark Valid](screenshots2/dwireshark2.6.3.png)
+
+2. **Missing Parameters**  
+   - **URL**: `http://localhost:9000/distance?x1=0&y1=0`  
+   - **Expected Output**:  
+     - **Browser**: `400 Bad Request`, Error: `Missing parameters: x1, y1, x2, and y2 are required.`  
+     - **Wireshark**: Confirmed `400 Bad Request`.
+   - **Screenshot**:  
+     - ![Distance Missing](screenshots2/dbad400.png)  
+     - ![Wireshark Missing](screenshots2/dwireshark400.png)
+
+3. **Invalid Parameters**  
+   - **URL**: `http://localhost:9000/distance?x1=abc&y1=0&x2=3&y2=4`  
+   - **Expected Output**:  
+     - **Browser**: `406 Not Acceptable`, Error: `Invalid input: x1, y1, x2, and y2 must be numeric.`  
+     - **Wireshark**: Confirmed `406 Not Acceptable`.
+   - **Screenshot**:  
+     - ![Distance Invalid](screenshots2/d406.png)  
+     - ![Wireshark Invalid](screenshots2/dwireshark406.png)
+
+---
+
+#### 2. Temperature Conversion
+**Endpoint**: `/convertTemp`  
+**Description**: Converts a temperature from Celsius to Fahrenheit.  
+**Parameters**:
+- `celsius` (numeric, required)
+
+**Test Cases**:
+1. **Valid Input**  
+   - **URL**: `http://localhost:9000/convertTemp?celsius=100`  
+   - **Expected Output**:  
+     - **Browser**: `200 OK`, Output: `100.0°C = 212.0°F`  
+     - **Wireshark**: Confirmed `200 OK` with payload.
+   - **Screenshot**:  
+     - ![Temperature Valid](screenshots2/tvalid.png)  
+     - ![Wireshark Valid](screenshots2/twireshark200.png)
+
+2. **Missing Parameter**  
+   - **URL**: `http://localhost:9000/convertTemp`  
+   - **Expected Output**:  
+     - **Browser**: `400 Bad Request`, Error: `I am not sure what you want me to do...`  
+     - **Wireshark**: Confirmed `400 Bad Request`.
+   - **Screenshot**:  
+     - ![Temperature Missing](screenshots2/t400.png)  
+     - ![Wireshark Missing](screenshots2/twireshark400.png)
+
+3. **Invalid Parameter**  
+   - **URL**: `http://localhost:9000/convertTemp?celsius=abc`  
+   - **Expected Output**:  
+     - **Browser**: `406 Not Acceptable`, Error: `Invalid input: celsius must be a valid number.`  
+     - **Wireshark**: Confirmed `406 Not Acceptable`.
+   - **Screenshot**:  
+     - ![Temperature Invalid](screenshots2/t406.png)  
+     - ![Wireshark Invalid](screenshots2/twireshark406.png)
+
+---
+
+### Summary of Work Completed
+1. Added two new request types:
+   - **Distance Calculation**: Handles numeric inputs to compute the Euclidean distance.
+   - **Temperature Conversion**: Converts Celsius to Fahrenheit with appropriate error handling.
+2. Implemented:
+   - **Error Handling**: Provided detailed error codes (`400` and `406`) with user-friendly error messages.
+   - **Validation**: Checked for missing and invalid parameters.
+3. Verified functionality through extensive testing:
+   - Valid inputs.
+   - Edge cases for missing and invalid inputs.
+   - Captured HTTP traffic using Wireshark to validate the server's response codes and payloads.
+4. Provided screenshots for all test cases to demonstrate the correctness of the implementation.
+
+### Files Included
+- **Browser Output**:  
+  - Distance: `screenshots2/dvalid2.6.3.png`, `screenshots2/dbad400.png`, `screenshots2/d406.png`.  
+  - Temperature: `screenshots2/tvalid.png`, `screenshots2/t400.png`, `screenshots2/t406.png`.  
+- **Wireshark Traces**:  
+  - Distance: `screenshots2/dwireshark2.6.3.png`, `screenshots2/dwireshark400.png`, `screenshots2/dwireshark406.png`.  
+  - Temperature: `screenshots2/twireshark200.png`, `screenshots2/twireshark400.png`, `screenshots2/twireshark406.png`.
