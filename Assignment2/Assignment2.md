@@ -506,3 +506,11 @@ Below are the test cases along with their corresponding screenshots:
 - **Wireshark Traces**:  
   - Distance: `screenshots2/dwireshark2.6.3.png`, `screenshots2/dwireshark400.png`, `screenshots2/dwireshark406.png`.  
   - Temperature: `screenshots2/twireshark200.png`, `screenshots2/twireshark400.png`, `screenshots2/twireshark406.png`.
+
+## 2.6.4 WebServer for Everyone 
+
+```
+http://34.226.213.4:9000
+```
+---
+
