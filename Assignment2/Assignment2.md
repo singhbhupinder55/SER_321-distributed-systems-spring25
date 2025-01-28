@@ -420,7 +420,7 @@ The web server is designed to handle a wide range of inputs robustly, ensuring i
      - **Browser**: `200 OK`, Output: `100.0°C = 212.0°F`  
      - **Wireshark**: Confirmed `200 OK` with payload.
    - **Screenshot**:  
-     - ![Temperature Valid](screenshots2/tvalid.png)  
+     - ![Temperature Valid](screenshots2/tvaild.png)  
      - ![Wireshark Valid](screenshots2/twireshark200.png)
 
 2. **Missing Parameter**  
