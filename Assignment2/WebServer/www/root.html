@@ -28,11 +28,26 @@
         <b>URL:</b> <code>/distance?x1=0&y1=0&x2=3&y2=4</code><br>
         <b>Example:</b> <a href="http://localhost:9000/distance?x1=0&y1=0&x2=3&y2=4" target="_blank">http://localhost:9000/distance?x1=0&y1=0&x2=3&y2=4</a>
       </li>
+	<p>Examples:</p>
+	<ul>
+  	<li><a href="/distance?x1=0&y1=0&x2=3&y2=4">Valid request: Calculate distance</a></li>
+  	<li><a href="/distance?x1=0&y1=0">Error example: Missing parameters (400)</a></li>
+  	<li><a href="/distance?x1=abc&y1=0&x2=3&y2=4">Error example: Invalid parameters (406)</a></li>
+	</ul>
+
       <li>
         <b>Temperature Conversion</b>: Converts Celsius to Fahrenheit with a precision option.<br>
         <b>URL:</b> <code>/convertTemp?celsius=25&precision=2</code><br>
         <b>Example:</b> <a href="http://localhost:9000/convertTemp?celsius=25&precision=2" target="_blank">http://localhost:9000/convertTemp?celsius=25&precision=2</a>
       </li>
+	<p>Examples:</p>
+	<ul>
+  	<li><a href="/convertTemp?celsius=25&precision=2">Valid request: Convert Celsius to Fahrenheit</a></li>
+  	<li><a href="/convertTemp">Error example: Missing parameter (400)</a></li>
+  	<li><a href="/convertTemp?celsius=abc&precision=2">Error example: Invalid Celsius value (406)</a></li>
+  	<li><a href="/convertTemp?celsius=25&precision=abc">Error example: Invalid precision value (406)</a></li>
+	</ul>
+
       <li>
         <b>Random Image</b>: Displays a random image.<br>
         <b>URL:</b> <code>/random</code><br>
