@@ -254,18 +254,13 @@ class WebServer {
           Map<String, String> query_pairs = new LinkedHashMap<String, String>();
           query_pairs = splitQuery(request.replace("github?", ""));
 
-          if (!query_pairs.containsKey("query")) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n\n");
-            builder.append("<html>Missing 'query' parameter.</html>");
-          } else {
           String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-         // System.out.println(json);
+            System.out.println(json);
 
             if (json == null || json.isEmpty()) {
-              builder.append("HTTP/1.1 500 Internal Server Error\n");
+              builder.append("HTTP/1.1 404 Not Found\n");
               builder.append("Content-Type: text/html; charset=utf-8\n\n");
-              builder.append("<html>Failed to fetch data from GitHub API.</html>");
+              builder.append("<html>GitHub user or resource not found.</html>");
             } else {
               try {
                 // Parse the JSON response
@@ -273,9 +268,7 @@ class WebServer {
                  builder.append("HTTP/1.1 200 OK\n");
                  builder.append("Content-Type: text/html; charset=utf-8\n");
                  builder.append("\n");
-                 builder.append("Check the todos mentioned in the Java source file");
-          // TODO: Parse the JSON returned by your fetch and create an appropriate
-          // response based on what the assignment document asks for
+                // builder.append("Check the todos mentioned in the Java source file");
                 builder.append("<html><body>");
                 builder.append("<h1>GitHub Repositories</h1>");
                 builder.append("<ul>");
@@ -302,19 +295,18 @@ class WebServer {
                 builder.append("<html>Error parsing GitHub API response.</html>");
               }
             }
-          }
-          response = builder.toString().getBytes();
 
-        } else {
+        }  else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
           builder.append("I am not sure what you want me to do...");
-          // Output
-          response = builder.toString().getBytes();
+
         }
+        // Output
+        response = builder.toString().getBytes();
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -402,30 +394,30 @@ class WebServer {
    *
    **/
   public String fetchURL(String aUrl) {
-    StringBuilder sb = new StringBuilder();
-    URLConnection conn = null;
-    InputStreamReader in = null;
-    try {
-      URL url = new URL(aUrl);
-      conn = url.openConnection();
-      if (conn != null)
-        conn.setReadTimeout(20 * 1000); // timeout in 20 seconds
-      if (conn != null && conn.getInputStream() != null) {
-        in = new InputStreamReader(conn.getInputStream(), Charset.defaultCharset());
-        BufferedReader br = new BufferedReader(in);
-        if (br != null) {
-          int ch;
-          // read the next character until end of reader
-          while ((ch = br.read()) != -1) {
-            sb.append((char) ch);
+      StringBuilder sb = new StringBuilder();
+      URLConnection conn = null;
+      InputStreamReader in = null;
+      try {
+        URL url = new URL(aUrl);
+        conn = url.openConnection();
+        if (conn != null)
+          conn.setReadTimeout(20 * 1000); // timeout in 20 seconds
+        if (conn != null && conn.getInputStream() != null) {
+          in = new InputStreamReader(conn.getInputStream(), Charset.defaultCharset());
+          BufferedReader br = new BufferedReader(in);
+          if (br != null) {
+            int ch;
+            // read the next character until end of reader
+            while ((ch = br.read()) != -1) {
+              sb.append((char) ch);
+            }
+            br.close();
           }
-          br.close();
         }
+        in.close();
+      } catch (Exception ex) {
+        System.out.println("Exception in url request:" + ex.getMessage());
       }
-      in.close();
-    } catch (Exception ex) {
-      System.out.println("Exception in url request:" + ex.getMessage());
+      return sb.toString();
     }
-    return sb.toString();
   }
-}
