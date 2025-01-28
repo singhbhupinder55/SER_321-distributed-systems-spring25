@@ -312,3 +312,53 @@ http://localhost:9000/multiply?num1=5.5&num2=7
 ---
 
 
+## Assignment 2.6.2: GitHub API Integration with WebServer
+
+### Task Description:
+This task required us to implement a web server that integrates with the GitHub API. Upon querying the endpoint with the path `github?query=<resource>`, the server fetches the requested resource from GitHub and displays the repository details. The server must also provide robust error handling to ensure it does not crash with invalid inputs.
+
+---
+
+### Implementation Details:
+
+1. **Valid Endpoint:**
+   - **URL:** `http://localhost:9000/github?query=users/amehlhase316/repos`
+   - **Expected Output:** 
+     - A list of repositories showing:
+       - Full Name
+       - ID
+       - Owner's Login
+   - **Screenshot:**  
+     ![Valid Request](screenshots2/valid2.6.2.png)  
+     ![Wireshark Valid](screenshots2/wiresharkvalid2.6.2.png)
+
+2. **Invalid Endpoint (Nonexistent User):**
+   - **URL:** `http://localhost:9000/github?query=users/bs123141/repos`
+   - **Expected Output:**  
+     - Message: `GitHub user or resource not found.`
+     - HTTP Code: 404 Not Found
+   - **Screenshot:**  
+     ![Not Found 404](screenshots2/notfound404.png)  
+     ![Wireshark 404](screenshots2/wireshark404.png)
+
+3. **Invalid Query:**
+   - **URL:** `http://localhost:9000/github`
+   - **Expected Output:**  
+     - Message: `Missing 'query' parameter.`
+     - HTTP Code: 400 Bad Request
+   - **Screenshot:**  
+     ![Bad Request 400](screenshots2/bad400.png)  
+     ![Wireshark 400](screenshots2/wireshark400.png)
+
+---
+
+### Error Handling:
+The following error codes were implemented:
+1. **400 Bad Request:** Returned when the query parameter is missing or malformed.
+2. **404 Not Found:** Returned when the requested GitHub user or resource does not exist.
+3. **500 Internal Server Error:** Triggered by runtime issues such as parsing errors or timeouts when interacting with the GitHub API.
+
+---
+
+### Conclusion:
+The web server is designed to handle a wide range of inputs robustly, ensuring it does not crash under unexpected or invalid requests. All requested error codes were tested and are functioning as intended.
