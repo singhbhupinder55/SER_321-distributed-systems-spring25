@@ -18,16 +18,10 @@ package funHttpServer;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.nio.charset.Charset;
 import org.json.JSONArray; // Added for JSON parsing
 import org.json.JSONObject; // Added for JSON parsing
-
 
 class WebServer {
   public static void main(String args[]) {
@@ -210,6 +204,8 @@ class WebServer {
               builder.append("HTTP/1.1 400 Bad Request\n");
               builder.append("Content-Type: text/html; charset=utf-8\n");
               builder.append("\n");
+              builder.append("<html><body>");
+              builder.append("<h1>400 Bad Request</h1>");
               builder.append("<html>Missing parameters: num1 and num2 are required.</html>");
             } else {
               try {
@@ -233,12 +229,16 @@ class WebServer {
                 builder.append("HTTP/1.1 406 Not Acceptable\n");
                 builder.append("Content-Type: text/html; charset=utf-8\n");
                 builder.append("\n");
+                builder.append("<html><body>");
+                builder.append("<h1>406 Not Acceptable</h1>");
                 builder.append("<html>Invalid input: num1 and num2 must be integers.</html>");
               }
             } } catch (Exception e) {
             builder.append("HTTP/1.1 400 Bad Request\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
+            builder.append("<html><body>");
+            builder.append("<h1>400 Bad Request</h1>");
             builder.append("<html>Error parsing parameters.</html>");
           }
 
@@ -260,6 +260,8 @@ class WebServer {
             if (json == null || json.isEmpty()) {
               builder.append("HTTP/1.1 404 Not Found\n");
               builder.append("Content-Type: text/html; charset=utf-8\n\n");
+              builder.append("<html><body>");
+              builder.append("<h1>404 Not Found</h1>");
               builder.append("<html>GitHub user or resource not found.</html>");
             } else {
               try {
@@ -296,13 +298,132 @@ class WebServer {
               }
             }
 
-        }  else {
+        }  else if (request.contains("distance?")) {
+        // Calculate distance between two points
+        try {
+          Map<String, String> query_pairs = splitQuery(request.replace("distance?", ""));
+          if (!query_pairs.containsKey("x1") || !query_pairs.containsKey("y1") ||
+                  !query_pairs.containsKey("x2") || !query_pairs.containsKey("y2")) {
+            // Missing parameters
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("<html><body>");
+            builder.append("<h1>400 Bad Request</h1>");
+            builder.append("<p>Missing parameters: x1, y1, x2, and y2 are required.</p>");
+            builder.append("</body></html>");
+          } else {
+            try {
+              // Parse inputs and calculate distance
+              double x1 = Double.parseDouble(query_pairs.get("x1"));
+              double y1 = Double.parseDouble(query_pairs.get("y1"));
+              double x2 = Double.parseDouble(query_pairs.get("x2"));
+              double y2 = Double.parseDouble(query_pairs.get("y2"));
+              double distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+              // Success response
+              builder.append("HTTP/1.1 200 OK\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("<html><body>");
+              builder.append("<h1>200 OK</h1>");
+              builder.append("<p>Distance: ").append(distance).append("</p>");
+              builder.append("</body></html>");
+            } catch (NumberFormatException e) {
+              // Invalid inputs
+              builder.append("HTTP/1.1 406 Not Acceptable\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("<html><body>");
+              builder.append("<h1>406 Not Acceptable</h1>");
+              builder.append("<p>Invalid input: x1, y1, x2, and y2 must be numeric.</p>");
+              builder.append("</body></html>");
+            }
+          }
+        } catch (Exception e) {
+          // General error
+          builder.append("HTTP/1.1 400 Bad Request\n");
+          builder.append("Content-Type: text/html; charset=utf-8\n");
+          builder.append("\n");
+          builder.append("<html><body>");
+          builder.append("<h1>400 Bad Request</h1>");
+          builder.append("<p>Error parsing parameters.</p>");
+          builder.append("</body></html>");
+        }
+        } else if (request.contains("convertTemp?")) {
+            try {
+              Map<String, String> query_pairs = splitQuery(request.replace("convertTemp?", ""));
+
+              // Check for missing 'celsius' parameter
+              if (!query_pairs.containsKey("celsius")) {
+                builder.append("HTTP/1.1 400 Bad Request\n");
+                builder.append("Content-Type: text/html; charset=utf-8\n");
+                builder.append("\n");
+                builder.append("<html><body>");
+                builder.append("<h1>400 Bad Request</h1>");
+                builder.append("<html>Error: Missing parameter. 'celsius' is required.</html>");
+              } else {
+                try {
+                  // Parse 'celsius' value
+                  double celsius = Double.parseDouble(query_pairs.get("celsius"));
+                  double fahrenheit = (celsius * 9 / 5) + 32;
+
+                  // Default precision is 2 if not provided
+                  int precision = 2;
+                  if (query_pairs.containsKey("precision")) {
+                    try {
+                      precision = Integer.parseInt(query_pairs.get("precision"));
+                      if (precision < 0) precision = 2; // Ensure non-negative precision
+                    } catch (NumberFormatException e) {
+                      // Handle invalid 'precision' input
+                      builder.append("HTTP/1.1 406 Not Acceptable\n");
+                      builder.append("Content-Type: text/html; charset=utf-8\n");
+                      builder.append("\n");
+                      builder.append("<html><body>");
+                      builder.append("<h1>406 Not Acceptable</h1>");
+                      builder.append("<html>Error: Invalid input. 'precision' must be a non-negative integer.</html>");
+                      response = builder.toString().getBytes();
+                      return response;
+                    }
+                  }
+
+                  // Format result with the given precision
+                  String result = String.format("%." + precision + "f", fahrenheit);
+
+                  // Generate success response
+                  builder.append("HTTP/1.1 200 OK\n");
+                  builder.append("Content-Type: text/html; charset=utf-8\n");
+                  builder.append("\n");
+                  builder.append(celsius + "°C = " + result + "°F");
+                } catch (NumberFormatException e) {
+                  // Handle invalid 'celsius' input
+                  builder.append("HTTP/1.1 406 Not Acceptable\n");
+                  builder.append("Content-Type: text/html; charset=utf-8\n");
+                  builder.append("\n");
+                  builder.append("<html><body>");
+                  builder.append("<h1>406 Not Acceptable</h1>");
+                  builder.append("<html>Error: Invalid input. 'celsius' must be a valid number.</html>");
+                }
+              }
+            } catch (Exception e) {
+              builder.append("HTTP/1.1 500 Internal Server Error\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("<html>Error: Unexpected server error occurred.</html>");
+            }
+          }
+
+
+
+          else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
           builder.append("Content-Type: text/html; charset=utf-8\n");
           builder.append("\n");
-          builder.append("I am not sure what you want me to do...");
+          builder.append("<html><body>");
+          builder.append("<h1>400 Bad Request</h1>");
+          builder.append("I am not sure what you want me to do, Bad Request, Try Again with right inputs");
 
         }
         // Output
