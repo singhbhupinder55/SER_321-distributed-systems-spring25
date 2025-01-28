@@ -409,39 +409,82 @@ The web server is designed to handle a wide range of inputs robustly, ensuring i
 
 #### 2. Temperature Conversion
 **Endpoint**: `/convertTemp`  
-**Description**: Converts a temperature from Celsius to Fahrenheit.  
-**Parameters**:
-- `celsius` (numeric, required)
 
-**Test Cases**:
-1. **Valid Input**  
-   - **URL**: `http://localhost:9000/convertTemp?celsius=100`  
-   - **Expected Output**:  
-     - **Browser**: `200 OK`, Output: `100.0°C = 212.0°F`  
-     - **Wireshark**: Confirmed `200 OK` with payload.
-   - **Screenshot**:  
-     - ![Temperature Valid](screenshots2/tvaild.png)  
-     - ![Wireshark Valid](screenshots2/twireshark200.png)
+### Description
 
-2. **Missing Parameter**  
-   - **URL**: `http://localhost:9000/convertTemp`  
-   - **Expected Output**:  
-     - **Browser**: `400 Bad Request`, Error: `I am not sure what you want me to do...`  
-     - **Wireshark**: Confirmed `400 Bad Request`.
-   - **Screenshot**:  
-     - ![Temperature Missing](screenshots2/t400.png)  
-     - ![Wireshark Missing](screenshots2/twireshark400.png)
+The `/convertTemp` endpoint converts a specified temperature from Celsius to Fahrenheit. Users can define the precision of the output by specifying the number of decimal places. This functionality is useful for applications requiring temperature conversions with varying degrees of accuracy.
 
-3. **Invalid Parameter**  
-   - **URL**: `http://localhost:9000/convertTemp?celsius=abc`  
-   - **Expected Output**:  
-     - **Browser**: `406 Not Acceptable`, Error: `Invalid input: celsius must be a valid number.`  
-     - **Wireshark**: Confirmed `406 Not Acceptable`.
-   - **Screenshot**:  
-     - ![Temperature Invalid](screenshots2/t406.png)  
-     - ![Wireshark Invalid](screenshots2/twireshark406.png)
+### Parameters
 
----
+- `celsius` (required): The temperature in Celsius to be converted.
+- `precision` (optional): The number of decimal places for the Fahrenheit result. Defaults to 2 if not specified.
+
+### Usage
+
+**Example URL:**
+- ``` 
+	http://localhost:9000/convertTemp?celsius=25&precision=2
+   ```
+
+**Expected Output:**
+
+- 25°C = 77.00°F
+
+
+### Error Handling
+
+The server provides appropriate error messages and HTTP status codes for various error scenarios:
+
+1. **Missing `celsius` Parameter:**
+   - **URL:** `http://localhost:9000/convertTemp`
+   - **HTTP Status Code:** `400 Bad Request`
+   - **Response:** `Error: Missing parameter. 'celsius' is required.`
+
+2. **Invalid `celsius` Value:**
+   - **URL:** `http://localhost:9000/convertTemp?celsius=abc&precision=2`
+   - **HTTP Status Code:** `406 Not Acceptable`
+   - **Response:** `Error: Invalid input. 'celsius' must be a valid number.`
+
+3. **Invalid `precision` Value:**
+   - **URL:** `http://localhost:9000/convertTemp?celsius=25&precision=xyz`
+   - **HTTP Status Code:** `406 Not Acceptable`
+   - **Response:** `Error: Invalid input. 'precision' must be a non-negative integer.`
+
+4. **Negative `precision` Value:**
+   - **URL:** `http://localhost:9000/convertTemp?celsius=25&precision=-1`
+   - **HTTP Status Code:** `200 OK`
+   - **Response:** `25°C = 77.00°F` (Defaults to 2 decimal places)
+
+### Test Cases and Screenshots
+
+Below are the test cases along with their corresponding screenshots:
+
+1. **Missing `celsius` Parameter:**
+   - **URL:** `http://localhost:9000/convertTemp`
+   - **HTTP Status Code:** `400 Bad Request`
+   - **Wireshark**: Confirmed `400 Bad Request`.
+   - **Response:** `Error: Missing parameter. 'celsius' is required.`
+   - **Screenshot:**
+   ![Missing Celsius Parameter](screenshots2/t400.png)
+   ![Missing Parameter Wireshark](screenshots2/twireshark400.png)
+
+2. **Invalid `celsius` Value:**
+   - **URL:** `http://localhost:9000/convertTemp?celsius=abc&precision=2`
+   - **HTTP Status Code:** `406 Not Acceptable`
+   - **Response:** `Error: Invalid input. 'celsius' must be a valid number.`
+   - **Wireshark**: Confirmed `406 Not Acceptable`.
+   - **Screenshot:**
+   ![Invalid Celsius Value](screenshots2/t406.png)
+   ![Invalid Celsius Wireshark](screenshots2/twireshark406.png)
+
+3. **Valid Conversion with Specified Precision:**
+   - **URL:** `http://localhost:9000/convertTemp?celsius=0&precision=2`
+   - **Expected Output:** `0.0°C = 32.00°F`
+   - **Wireshark**: Confirmed `200 OK` with payload. 
+   - **Screenshot:**
+   ![Valid Conversion with Precision](screenshots2/tvaild.png)
+   ![Valid Wireshark Capture](screenshots2/twireshark200.png)
+
 
 ### Summary of Work Completed
 1. Added two new request types:
