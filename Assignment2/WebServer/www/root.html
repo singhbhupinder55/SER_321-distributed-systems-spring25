@@ -13,3 +13,45 @@
 		${links}
 	</body>
 </html>
+<html>
+  <head>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+  </head>
+  <body>
+    <h3>Welcome to the Fun Web Server!</h3>
+    <p>This server allows you to make a variety of GET requests. Below are the available endpoints:</p>
+
+    <h4>Available Requests:</h4>
+    <ul>
+      <li>
+        <b>Distance Calculation</b>: Computes the Euclidean distance between two points.<br>
+        <b>URL:</b> <code>/distance?x1=0&y1=0&x2=3&y2=4</code><br>
+        <b>Example:</b> <a href="http://localhost:9000/distance?x1=0&y1=0&x2=3&y2=4" target="_blank">http://localhost:9000/distance?x1=0&y1=0&x2=3&y2=4</a>
+      </li>
+      <li>
+        <b>Temperature Conversion</b>: Converts Celsius to Fahrenheit with a precision option.<br>
+        <b>URL:</b> <code>/convertTemp?celsius=25&precision=2</code><br>
+        <b>Example:</b> <a href="http://localhost:9000/convertTemp?celsius=25&precision=2" target="_blank">http://localhost:9000/convertTemp?celsius=25&precision=2</a>
+      </li>
+      <li>
+        <b>Random Image</b>: Displays a random image.<br>
+        <b>URL:</b> <code>/random</code><br>
+        <b>Example:</b> <a href="http://localhost:9000/random" target="_blank">http://localhost:9000/random</a>
+      </li>
+      <li>
+        <b>JSON Response</b>: Returns a JSON object containing information about the random image.<br>
+        <b>URL:</b> <code>/json</code><br>
+        <b>Example:</b> <a href="http://localhost:9000/json" target="_blank">http://localhost:9000/json</a>
+      </li>
+      <li>
+        <b>File Access</b>: Accesses files in the <code>www</code> directory.<br>
+        <b>URL:</b> <code>/file/FILENAME</code><br>
+        <b>Example:</b> <a href="http://localhost:9000/file/sample.html" target="_blank">http://localhost:9000/file/sample.html</a>
+      </li>
+    </ul>
+
+    <h4>File Structure in the www Directory</h4>
+    <p>The following files are available for access:</p>
+    ${links}
+  </body>
+</html>
