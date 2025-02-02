@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ServerTest" tests="23" skipped="0" failures="0" errors="0" timestamp="2025-02-02T18:19:43" hostname="Third-MacBook-Pro.local" time="0.123">
+  <properties/>
+  <testcase name="addManyRequest" classname="ServerTest" time="0.037"/>
+  <testcase name="testCharCountTotalCharacters" classname="ServerTest" time="0.003"/>
+  <testcase name="testInvalidRequestType" classname="ServerTest" time="0.002"/>
+  <testcase name="addRequest" classname="ServerTest" time="0.006"/>
+  <testcase name="testAddItemWithZeroQuantity" classname="ServerTest" time="0.005"/>
+  <testcase name="testBuyItemWithoutProductName" classname="ServerTest" time="0.004"/>
+  <testcase name="testCharCountInvalidFindField" classname="ServerTest" time="0.003"/>
+  <testcase name="testNonJSONRequest" classname="ServerTest" time="0.002"/>
+  <testcase name="testViewEmptyInventory" classname="ServerTest" time="0.005"/>
+  <testcase name="testAddManyEmptyList" classname="ServerTest" time="0.005"/>
+  <testcase name="testBuyItemWithoutQuantity" classname="ServerTest" time="0.002"/>
+  <testcase name="testAddItemToInventory" classname="ServerTest" time="0.003"/>
+  <testcase name="testCharCountEmptyString" classname="ServerTest" time="0.002"/>
+  <testcase name="echoRequest" classname="ServerTest" time="0.006"/>
+  <testcase name="testBuyItemWithNegativeQuantity" classname="ServerTest" time="0.003"/>
+  <testcase name="testBuyItemFromInventory" classname="ServerTest" time="0.005"/>
+  <testcase name="testCharCountMissingCountField" classname="ServerTest" time="0.003"/>
+  <testcase name="testBuyNonExistingItem" classname="ServerTest" time="0.005"/>
+  <testcase name="testCharCountSpecificCharacter" classname="ServerTest" time="0.004"/>
+  <testcase name="testAddItemWithoutProductName" classname="ServerTest" time="0.002"/>
+  <testcase name="testCharCountCharacterNotFound" classname="ServerTest" time="0.003"/>
+  <testcase name="testBuyMoreThanAvailable" classname="ServerTest" time="0.004"/>
+  <testcase name="notJSON" classname="ServerTest" time="0.004"/>
+  <system-out><![CDATA[Inventory reset before tests.
+{"ok":false,"message":"Values in array need to be ints"}
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+{"ok":false,"message":"Field num2 does not exist in request"}
+{"ok":false,"message":"Field num1 does not exist in request"}
+{"ok":false,"message":"Field num1 does not exist in request"}
+{"ok":false,"type":"add","message":"Field num1/num2 needs to be of type: int"}
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+{"ok":false,"message":"Field data does not exist in request"}
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+Inventory reset before tests.
+{"ok":false,"message":"Field num2 does not exist in request"}
+{"ok":false,"message":"Field num1 does not exist in request"}
+{"ok":false,"message":"Field num1 does not exist in request"}
+{"ok":false,"type":"add","message":"Field num1/num2 needs to be of type: int"}
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
