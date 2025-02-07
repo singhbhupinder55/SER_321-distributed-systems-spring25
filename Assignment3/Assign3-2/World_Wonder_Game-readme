@@ -1,0 +1,212 @@
+
+# Wonder of the World Guessing Game
+
+## Description
+This project is a **client-server-based guessing game** where a single-player client connects to a server and attempts to guess **Wonders of the World** based on images and hints provided by the server. The game tracks player scores and maintains a **leaderboard**.
+
+### **How It Works:**
+1. The client starts by connecting to the server and sending a `"hello"` message.
+2. The server requests the **player’s name and age**.
+3. The player is presented with **three choices**:
+   - Play the game
+   - View the leaderboard
+   - Quit the game
+4. If the player chooses to play:
+   - They select the number of rounds.
+   - The game begins, showing **an image and a hint**.
+   - The player can:
+     - Make a **guess**.
+     - Request **another hint**.
+     - **Skip** to the next round.
+     - Check **remaining hints**.
+5. At the end of the game, the **final score is displayed**, and the leaderboard is updated.
+
+---
+
+## **Requirement Checklist**
+- [x] **Structure** - The project follows the provided starter code structure.
+- [x] **Gradle File** - The project includes a Gradle build file.
+- [x] **Server Execution** - The server runs using `gradle runServer -Pport=port`.
+- [x] **Client Execution** - The client runs using `gradle runClient -Pport=port -Phost=hostIP`.
+- [x] **README.md** - This file includes descriptions, a checklist, and explanations.
+- [x] **Protocol Documentation** - The protocol structure is explained below.
+- [x] **Video Demo** - A screencast (4-7 min) is linked below.
+- [x] **Robustness** - The program is designed to handle errors and invalid inputs gracefully.
+- [x] **UDP Explanation** - A brief discussion on adapting to UDP is included.
+
+---
+
+## **Protocol Description**
+The **client and server communicate using JSON-based messages**. Below is the structured protocol:
+
+### **1. Client Starts & Sends "hello"**
+#### Request:
+```json
+{ "type": "hello" }
+```
+#### Server Response:
+```json
+{ "type": "request_name", "value": "Hello! Please enter your name?" }
+```
+
+### **2. Client Sends Name**
+#### Request:
+```json
+{ "type": "name", "value": "Alice" }
+```
+#### Server Response:
+```json
+{ "type": "request_age", "value": "Nice to meet you, Alice! Please enter your age." }
+```
+
+### **3. Client Sends Age**
+#### Request:
+```json
+{ "type": "age", "value": "25" }
+```
+#### Server Response:
+```json
+{
+  "type": "menu",
+  "value": "Welcome! What would you like to do?\n1. Play the Game\n2. View Leaderboard\n3. Quit"
+}
+```
+
+### **4. Client Chooses an Option**
+#### Request:
+```json
+{ "type": "menu_choice", "value": "1" }
+```
+#### Server Response (Game Start):
+```json
+{ "type": "request_rounds", "value": "How many rounds would you like to play?" }
+```
+
+### **5. Client Chooses Number of Rounds**
+#### Request:
+```json
+{ "type": "rounds", "value": "3" }
+```
+#### Server Response:
+```json
+{
+  "type": "start_game",
+  "value": "Game started! Round 1 of 3",
+  "hint": "This wonder is located in Arizona, USA.",
+  "image": "img/GrandCanyon1.png"
+}
+```
+
+### **6. Client Interactions**
+#### **Making a Guess**
+```json
+{ "type": "player_input", "value": "Grand Canyon" }
+```
+**Correct Response:**
+```json
+{
+  "type": "start_game",
+  "value": "Correct! Starting round 2 of 3",
+  "hint": "This monument was built over 5000 years ago.",
+  "image": "img/Stonehenge1.png"
+}
+```
+**Incorrect Response:**
+```json
+{ "type": "guess_response", "value": "Incorrect. Try again!" }
+```
+
+#### **Skipping to the Next Round**
+```json
+{ "type": "player_input", "value": "skip" }
+```
+```json
+{
+  "type": "start_game",
+  "value": "You skipped! Starting round 2 of 3",
+  "hint": "It is in Rome, Italy.",
+  "image": "img/Colosseum1.png"
+}
+```
+
+#### **Requesting a Hint**
+```json
+{ "type": "player_input", "value": "next" }
+```
+```json
+{ "type": "hint", "value": "It is aligned with the solstices." }
+```
+
+#### **Requesting Remaining Hints**
+```json
+{ "type": "player_input", "value": "remaining" }
+```
+```json
+{ "type": "hints_left", "value": "You have 2 hints left." }
+```
+
+### **7. Game Over & Leaderboard**
+- After all rounds, the server sends:
+```json
+{
+  "type": "game_over",
+  "value": "Game over! Your final score: 15 points. Returning to main menu."
+}
+```
+- If the client requests the leaderboard:
+```json
+{ "type": "menu_choice", "value": "2" }
+```
+```json
+{
+  "type": "leaderboard",
+  "value": "📊 Leaderboard:\nAlice: 15 points\nBob: 10 points"
+}
+```
+
+---
+
+## **Video Demonstration**
+📌 **[Watch the Screencast Here](https://www.youtube.com/watch?v=qvU6N78Hia8)** *(A 4-7 min demo showcasing the game in action.)*
+
+---
+
+## **Robustness & Error Handling**
+This game was designed to be **robust** by:
+1. **Validating inputs on the server side** (e.g., checking if the input is valid before processing).
+2. **Handling network errors** so the client/server do not crash.
+3. **Providing detailed error messages** to the client, ensuring users understand incorrect inputs.
+4. **Ensuring the game state is always maintained**, even in case of unexpected disconnections.
+
+### **Example Error Handling**
+#### **Invalid Input Type**
+```json
+{
+  "type": "error",
+  "status": "fail",
+  "message": "Invalid input. Please enter a number."
+}
+```
+
+#### **Unknown Command**
+```json
+{
+  "type": "invalid_input",
+  "value": "⚠️ Unknown command. Please enter a valid option."
+}
+```
+
+---
+
+## **Using UDP Instead of TCP**
+If we were to use **UDP instead of TCP**, we would need to:
+1. **Remove connection persistence** since UDP is connectionless.
+2. **Manually track message order** (UDP does not guarantee order).
+3. **Implement retries for lost messages** since UDP does not ensure delivery.
+4. **Use `DatagramSocket` instead of `Socket`** for communication.
+
+---
+
+This **README.md** provides a structured overview of the **Wonder of the World Guessing Game**, detailing execution, requirements, protocol, and robustness. 🎮🌍
+
+
