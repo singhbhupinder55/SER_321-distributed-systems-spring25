@@ -92,3 +92,88 @@ For the images: The numbering is alwas starting at 1 which is the "main" view, i
 - addEventHandlers(EventHandlers handlerObj) :  Add event listeners
 - appendOutput(String message) :  Add message to output text
 
+
+## Client-Server Protocol
+
+This project follows a structured **client-server protocol** to facilitate communication between the **ClientGui** and **SockServer**.
+
+### 📌 Message Format
+Each message exchanged between the client and the server follows this structure:
+
+```json
+{
+    "type": "message_type",
+    "status": "ok/fail",
+    "value": "message_payload"
+}
+ ```
+
+### Example Requests & Responses
+- Client Sends a Greeting
+```json
+{
+    "type": "hello"
+}
+```
+
+- Server Responds with a Name Request
+```json
+{
+    "type": "request_name",
+    "status": "ok",
+    "value": "Hello, Please enter your name"
+}
+```
+- Client Sends Name
+```json
+{
+    "type": "name",
+    "value": "John"
+}
+```
+
+- Server Asks for Age
+```json
+{
+    "type": "request_age",
+    "status": "ok",
+    "value": "Nice to meet you, John! Now, please enter your age (e.g. 25)."
+}
+```
+
+### Error Handling
+- If the client sends an unrecognized command or incorrect input, the server will return an error response.
+- Example: Invalid Age
+```json
+{
+    "type": "age",
+    "value": "-5"
+}
+```
+
+- Server Responds with Error
+```json
+{
+    "type": "error",
+    "status": "fail",
+    "message": "Invalid age. Please enter a valid positive number."
+}
+```
+
+- Example: Unknown Command
+```json
+{
+    "type": "unknown_command"
+}
+```
+
+- Server Responds with Error
+```json
+{
+    "type": "error",
+    "status": "fail",
+    "message": "Invalid command: unknown_command"
+}
+```
+
+

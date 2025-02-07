@@ -140,6 +140,14 @@ public class OutputPanel extends JPanel {
     return input.getText();
   }
 
+
+  /**
+   * Clears the input text field after submission
+   */
+  public void clearInputText() {
+    input.setText(""); // Clears the input field
+  }
+
   /**
    * Set points in label box
    * @param points current points in round
@@ -158,7 +166,7 @@ public class OutputPanel extends JPanel {
 
   /**
    * Register event observers
-   * @param handler
+   * @param handlerObj
    */
   public void addEventHandlers(EventHandlers handlerObj) {
     handlers.add(handlerObj);
@@ -170,5 +178,20 @@ public class OutputPanel extends JPanel {
    */
   public void appendOutput(String message) {
     area.append(message + "\n");
+
+    // Check if message contains updated score in format "Total Score: X"
+    if (message.contains("Total Score: ")) {
+      try {
+        String[] parts = message.split("Total Score: ");
+        if (parts.length > 1) {
+          int newScore = Integer.parseInt(parts[1].trim());
+          setPoints(newScore);  // Update the points label
+          pointsLabel.repaint(); // Ensure the UI refreshes
+          pointsLabel.revalidate();
+        }
+      } catch (NumberFormatException e) {
+        System.err.println("Error parsing score from message: " + message);
+      }
+    }
   }
 }

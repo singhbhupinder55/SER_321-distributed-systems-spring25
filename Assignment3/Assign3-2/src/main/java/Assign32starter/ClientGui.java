@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
 
@@ -46,6 +47,9 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 	OutputStream out;
 	ObjectOutputStream os;
 	BufferedReader bufferedReader;
+
+
+
 
 	// TODO: SHOULD NOT BE HARDCODED change to spec
 	String host = "localhost";
@@ -84,10 +88,10 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 		frame.add(outputPanel, c);
 
 		picPanel.newGame(1);
-		insertImage("img/Colosseum1.png", 0, 0);
+		insertImage("img/hi.png", 0, 0);
 
 		open(); // opening server connection here
-		currentMess = "{'type': 'start'}"; // very initial start message for the connection
+		currentMess = new JSONObject().put("type", "hello").toString(); // Initial message
 		try {
 			os.writeObject(currentMess);
 		} catch (IOException e) {
@@ -98,9 +102,9 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 		System.out.println("Got a connection to server");
 		JSONObject json = new JSONObject(string);
 		outputPanel.appendOutput(json.getString("value")); // putting the message in the outputpanel
+		currentMess = json.getString("type"); // Store next expected step
 
-		// reading out the image (abstracted here as just a string)
-		System.out.println("Pretend I got an image: " + json.getString("image"));
+		insertImage(json.getString("image"), 0, 0); // Ensure server-sent image is displayed
 		/// would put image in picture panel
 		close(); //closing the connection to server
 
@@ -137,22 +141,23 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 	 * @throws IOException An error occured with your image file
 	 */
 	public boolean insertImage(String filename, int row, int col) throws IOException {
+
 		System.out.println("Image insert");
 		String error = "";
 		try {
 			// insert the image
 			if (picPanel.insertImage(filename, row, col)) {
 				// put status in output
-				outputPanel.appendOutput("Inserting " + filename + " in position (" + row + ", " + col + ")"); // you can of course remove this
 				return true;
 			}
-			error = "File(\"" + filename + "\") not found.";
+			//error = "File(\"" + filename + "\") not found.";
 		} catch(PicturePanel.InvalidCoordinateException e) {
 			// put error in output
 			error = e.toString();
 		}
 		outputPanel.appendOutput(error);
 		return false;
+
 	}
 
 	/**
@@ -169,29 +174,126 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 
 		// Pulls the input box text
 		String input = outputPanel.getInputText();
+			outputPanel.clearInputText(); // Clears the input field after submission
 
 		// TODO evaluate the input from above and create a request for client. 
 
-		// send request to server
-		try {
-			  os.writeObject("Blub"); // this will crash the server, since it is not a JSON and thus the server will not handle it. 
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			// Create JSON message for the server
+			JSONObject message = new JSONObject();
+
+			if (currentMess.equals("request_name")) { // handling name only
+				message.put("type", "name");
+				message.put("value", input);
+
+			} else if (currentMess.equals("request_age")) { // Expecting name & age
+				message.put("type", "age");
+				message.put("value", input);
+
+			} else if (currentMess.equals("menu")) {
+				message.put("type", "menu_choice");
+				message.put("value", input);
+
+			} else if (currentMess.equals("request_rounds")) {
+					message.put("type", "rounds");
+					message.put("value", input);
+
 			}
 
-		// wait for an answer and handle accordingly
-		try {
+			else if (currentMess.equals("start_game") || currentMess.equals("guess_response")) {
+				message.put("type", "player_input");
+				message.put("value", input);
+			}
+
+
+			else {
+				message.put("type", "input");
+				message.put("value", input);
+
+			}
+
+			System.out.println("Sending JSON to server: " + message.toString()); // Debugging log
+			// Send JSON message to the server
+			os.writeObject(message.toString());
+
+
+			// wait for an answer and handle accordingly
+
 			System.out.println("Waiting on response");
 			String string = this.bufferedReader.readLine();
-			System.out.println(string);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		close();
+			JSONObject response = new JSONObject(string);
+
+			// Store the latest server message type
+			currentMess = response.getString("type");  // Now the client always knows what to expect next
+
+
+
+			// Process response
+
+			if (response.has("status") && response.getString("status").equals("fail")) {
+				outputPanel.appendOutput("⚠️ Error: " + response.getString("message"));
+				return;
+			}
+
+			if (response.getString("type").equals("error")) {
+				outputPanel.appendOutput("Error: " + response.getString("message"));
+				return;
+			}
+
+			// Handle "invalid_input" to let the user retry
+			if (response.getString("type").equals("invalid_input")) {
+				outputPanel.appendOutput(response.getString("value")); // Show error message
+				return; // Do not change `currentMess`, so the client stays in the same game state
+			}
+
+			// Display response message
+			if (response.has("value")) {
+				outputPanel.appendOutput(response.getString("value"));
+			}
+
+			// Display score update
+			if (response.getString("type").equals("score_update")) {
+				int updatedScore = response.getInt("score");
+				outputPanel.setPoints(updatedScore); // Update UI points label
+			}
+
+			if (response.has("image")) {
+				insertImage(response.getString("image"), 0, 0);
+			}
+
+
+
+			// Handle "start_game" → Display image & hint
+			if (response.getString("type").equals("start_game")) {
+				outputPanel.appendOutput("Hint: " + response.getString("hint"));
+				insertImage(response.getString("image"), 0, 0);
+
+			}
+
+
+			// Display the final score in the UI when the game ends
+			if (response.getString("type").equals("game_over")) {
+				outputPanel.appendOutput(response.getString("value")); //  Show final score
+				currentMess = "menu";
+			}
+
+			if (currentMess.equals("quit")) {
+				outputPanel.appendOutput("👋 Exiting the game...");
+				System.out.println("Thanks for playing! 👋 the End");
+				close();  // Close socket connection
+				frame.dispose();  // Close GUI
+				return;
+			}
+
+
+			close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			outputPanel.appendOutput("⚠️ Network Error: Unable to communicate with the server."); // Prevents crash on network failure
+		}  catch (JSONException e) {
+			outputPanel.appendOutput("⚠️ JSON Error: Invalid response received."); // Prevents crash on bad JSON
+		} catch (Exception e) {
+			outputPanel.appendOutput("⚠️ Unexpected Error: " + e.getMessage()); // Handles any unknown error
 		}
 	}
 
@@ -208,14 +310,20 @@ public class ClientGui implements Assign32starter.OutputPanel.EventHandlers {
 	}
 
 	public void open() throws UnknownHostException, IOException {
-		this.sock = new Socket(host, port); // connect to host and socket
+		try {
+			this.sock = new Socket(host, port); // connect to host and socket
 
-		// get output channel
-		this.out = sock.getOutputStream();
-		// create an object output writer (Java only)
-		this.os = new ObjectOutputStream(out);
-		this.bufferedReader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			// get output channel
+			this.out = sock.getOutputStream();
+			// create an object output writer (Java only)
+			this.os = new ObjectOutputStream(out);
+			this.bufferedReader = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
+		} catch (UnknownHostException e) {
+			outputPanel.appendOutput("⚠️ Error: Unknown host. Please check server address."); //  Now shows an error message instead of crashing
+		} catch (IOException e) {
+			outputPanel.appendOutput("⚠️ Error: Cannot connect to server. Is it running?"); //  Now handles connection failures properly
+		}
 	}
 	
 	public void close() {
