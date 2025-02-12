@@ -44,9 +44,41 @@ class Performer {
         return json;
     }
 
+    public JSONObject display(int index) {
+        JSONObject json = new JSONObject();
+        json.put("datatype", 3);
+        json.put("type", "display");
+
+        if (index < 0 || index >= state.size()) {
+            json.put("data", "Invalid index. Please enter a number between 1 and " + (state.size()));
+        } else {
+            json.put("data", state.get(index));
+        }
+
+        return json;
+    }
+
+    public JSONObject count() {
+        JSONObject json = new JSONObject();
+        json.put("datatype", 4);
+        json.put("type", "count");
+        json.put("data", state.size());
+        return json;
+    }
+
+    public JSONObject quit() {
+        System.out.println("Client requested to quit.");
+        JSONObject json = new JSONObject();
+        json.put("datatype", 0);
+        json.put("type", "quit");
+        json.put("message", "Client disconnected.");
+        return json;
+    }
+
     public static JSONObject error(String err) {
         JSONObject json = new JSONObject();
-        json.put("error", err);
+        json.put("type", "error");
+        json.put("message", err);
         return json;
     }
 

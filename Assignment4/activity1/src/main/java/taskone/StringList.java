@@ -25,4 +25,13 @@ class StringList {
     public String toString() {
         return strings.toString();
     }
+
+    public String get(int index) {
+        if (index >= 0 && index < strings.size()) {
+            return strings.get(index);
+        } else {
+            return "Invalid index"; // Error message if index is out of bounds
+        }
+    }
+
 }

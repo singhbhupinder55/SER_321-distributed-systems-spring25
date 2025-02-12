@@ -53,17 +53,28 @@ public class Client {
      */
     public static JSONObject display() {
         JSONObject request = new JSONObject();
-        request.put("selected", 2);
-        request.put("data", "");
+        request.put("selected", 3);
+        //request.put("data", "");
+        //return request;
+        System.out.print("Enter the index to display: ");
+        String input = "";
+        try {
+            input = stdin.readLine(); // Read user input
+        } catch (IOException e) {
+            input = "";  // Even if reading fails, just send empty input
+        }
+
+        request.put("data", input); // Send raw input to the Server
         return request;
     }
+
 
     /**
      * Function JSONObject count().
      */
     public static JSONObject count() {
         JSONObject request = new JSONObject();
-        request.put("selected", 3);
+        request.put("selected", 4);
         request.put("data", "");
         return request;
     }
@@ -111,10 +122,10 @@ public class Client {
             do {
                 System.out.println();
                 System.out.println("Client Menu");
-                System.out.println("Please select a valid option (1-5). 0 to diconnect the client");
+                System.out.println("Please select a valid option (1,3,4,0). 0 to diconnect the client");
                 System.out.println("1. add <string> - adds a string to the list and display it");
-                System.out.println("2. display - display the list");
-                System.out.println("3. count - returns the elements in the list");
+                System.out.println("3. display - display the list");
+                System.out.println("4. count - returns the elements in the list");
                 System.out.println("0. quit");
                 System.out.println();
                 choice = input.nextInt(); // what if not int.. should error handle this
@@ -123,17 +134,17 @@ public class Client {
                     case (1):
                         request = add();
                         break;
-                    case (2):
+                    case (3):
                         request = display();
                         break;
-                    case (3):
+                    case (4):
                         request = count();
                         break;
                     case (0):
                         request = quit();
                         break;
                     default:
-                        System.out.println("Please select a valid option (0-6).");
+                        System.out.println("Please select a valid option (0-4).");
                         break;
                 }
                 if (request != null) {
@@ -143,20 +154,46 @@ public class Client {
                     JSONObject response = JsonUtils.fromByteArray(responseBytes);
 
                     if (response.has("error")) {
-                        System.out.println(response.getString("error"));
+                        System.out.println("Error: " + response.getString("message"));
+                    } else if (response.has("data")) {
+                        System.out.println();
+                        System.out.println("The response from the server: ");
+                        System.out.println("datatype: " + response.getString("type"));
+
+                        if (response.get("data") instanceof Integer) {
+                            System.out.println("Count: " + response.getInt("data"));
+                        } else {
+                            System.out.println("Data: " + response.getString("data"));
+                        }
+                        } else if (response.optString("type").equals("quit")) {
+                        System.out.println();
+                        System.out.println("The response from the server: ");
+                        System.out.println("datatype: " + response.getString("type"));
+                        System.out.println(response.optString("message", "Client disconnected."));
+
+                        sock.close();
+                        out.close();
+                        in.close();
+                        System.exit(0);
                     } else {
                         System.out.println();
                         System.out.println("The response from the server: ");
                         System.out.println("datatype: " + response.getString("type"));
-                        System.out.println("data: " + response.getString("data"));
+                        if (response.get("data") instanceof Integer) {
+                            System.out.println("Count: " + response.getInt("data"));
+                        } else {
+                            System.out.println("Data: " + response.getString("data"));
+                        }
+
                         System.out.println();
-                        String typeStr = (String) response.getString("type");
-                        if (typeStr.equals("quit")) {
+                        if (response.optString("type").equals("quit")) {
+                            System.out.println("Client is disconnecting...");
                             sock.close();
                             out.close();
                             in.close();
                             System.exit(0);
                         }
+
                     }
                 }
             } while (true);
