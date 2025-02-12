@@ -18,11 +18,11 @@ class StringList {
         return strings.indexOf(str) >= 0;
     }
 
-    public int size() {
+    public synchronized int size() {
         return strings.size();
     }
 
-    public String toString() {
+    public synchronized String toString() {
         return strings.toString();
     }
 
