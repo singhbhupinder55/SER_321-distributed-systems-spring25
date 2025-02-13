@@ -11,66 +11,62 @@ dependencies {
 //define main class
 mainClassName = 'Concentration'
 
-task runServer(type: JavaExec) {
+
+task runTask1(type: JavaExec) {
   group 'server'
-  description 'Creates Server socket waits for messages'
+  description 'Runs Task 1 Server (Single-threaded)'
 
   classpath = sourceSets.main.runtimeClasspath
 
   main = 'taskone.Server'
   standardInput = System.in
-  
-  // run with arguments e.g.: gradle runServer -Pport=9099 -q --console=plain
-  if (project.hasProperty('port')) {
-    args(project.getProperty('port'));
-  }
+
+  def port = project.hasProperty('port') ? project.getProperty('port') : '8000'
+  args(port)
 }
 
 
-task runThreadedServer(type: JavaExec) {
+task runTask2(type: JavaExec) {
   group 'server'
-  description 'Creates a multi-threaded server to handle multiple clients'
+  description 'Runs Task 2 Server (Multi-threaded)'
 
   classpath = sourceSets.main.runtimeClasspath
 
   main = 'taskone.ThreadedServer'
   standardInput = System.in
 
-  // run with arguments e.g.: gradle runThreadedServer -Pport=9099 -q --console=plain
-  if (project.hasProperty('port')) {
-    args(project.getProperty('port'));
-  }
+  def port = project.hasProperty('port') ? project.getProperty('port') : '8000'
+  args(port)
 }
 
-task runThreadPoolServer(type: JavaExec) {
+task runTask3(type: JavaExec) {
   group 'server'
-  description 'Creates a multi-threaded server with a limited number of concurrent clients'
+  description 'Runs Task 3 Server (ThreadPool with limited clients)'
 
   classpath = sourceSets.main.runtimeClasspath
 
   main = 'taskone.ThreadPoolServer'
   standardInput = System.in
 
-  // Run with arguments e.g.: gradle runThreadPoolServer -Pport=9099 -Pthreads=3 -q --console=plain
-  if (project.hasProperty('port') && project.hasProperty('threads')) {
-    args(project.getProperty('port'), project.getProperty('threads'));
-  }
+  def port = project.hasProperty('port') ? project.getProperty('port') : '8000'
+  def threads = project.hasProperty('threads') ? project.getProperty('threads') : '4'
+  args(port, threads)
 }
 
 
 task runClient(type: JavaExec) {
   group 'client'
-  description 'Creates client socket sends a message to the server'
+  description 'Runs Client with default values (host=localhost, port=8000)'
 
   classpath = sourceSets.main.runtimeClasspath
   standardInput = System.in
 
   main = 'taskone.Client'
   standardInput = System.in
-  
-  // run with arguments e.g.: gradle runClient -Phost=localhost -Pport=9099 -q --console=plain
-  if (project.hasProperty("host") && project.hasProperty('port')) {
-    args(project.getProperty('host'), project.getProperty('port'));
-  }
+
+  def host = project.hasProperty("host") ? project.getProperty("host") : "localhost"
+  def port = project.hasProperty('port') ? project.getProperty('port') : "8000"
+
+  args(host, port)
 }
 
