@@ -49,6 +49,8 @@ class Server {
             System.out.println("Accepting a Request...");
             conn = server.accept();
             System.out.println("Client connected!");
+
+            // 🔹 Send a welcome message before starting interaction
             doPerform();
 
         }
@@ -62,6 +64,7 @@ class Server {
             out = conn.getOutputStream();
             in = conn.getInputStream();
             System.out.println("Server connected to client:");
+
             while (!quit) {
 
                 byte[] messageBytes = NetworkUtils.receive(in);
@@ -131,4 +134,6 @@ class Server {
             e.printStackTrace();
         }
     }
+
+
 }

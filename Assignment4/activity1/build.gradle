@@ -26,6 +26,7 @@ task runServer(type: JavaExec) {
   }
 }
 
+
 task runThreadedServer(type: JavaExec) {
   group 'server'
   description 'Creates a multi-threaded server to handle multiple clients'
@@ -40,6 +41,22 @@ task runThreadedServer(type: JavaExec) {
     args(project.getProperty('port'));
   }
 }
+
+task runThreadPoolServer(type: JavaExec) {
+  group 'server'
+  description 'Creates a multi-threaded server with a limited number of concurrent clients'
+
+  classpath = sourceSets.main.runtimeClasspath
+
+  main = 'taskone.ThreadPoolServer'
+  standardInput = System.in
+
+  // Run with arguments e.g.: gradle runThreadPoolServer -Pport=9099 -Pthreads=3 -q --console=plain
+  if (project.hasProperty('port') && project.hasProperty('threads')) {
+    args(project.getProperty('port'), project.getProperty('threads'));
+  }
+}
+
 
 task runClient(type: JavaExec) {
   group 'client'

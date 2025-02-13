@@ -54,8 +54,6 @@ public class Client {
     public static JSONObject display() {
         JSONObject request = new JSONObject();
         request.put("selected", 3);
-        //request.put("data", "");
-        //return request;
         System.out.print("Enter the index to display: ");
         String input = "";
         try {
@@ -117,12 +115,14 @@ public class Client {
             sock = new Socket(host, port);
             OutputStream out = sock.getOutputStream();
             InputStream in = sock.getInputStream();
+
+
             Scanner input = new Scanner(System.in);
             int choice;
             do {
                 System.out.println();
                 System.out.println("Client Menu");
-                System.out.println("Please select a valid option (1,3,4,0). 0 to diconnect the client");
+                System.out.println("Please select a valid option (1,3,4,0). 0 to disconnect the client");
                 System.out.println("1. add <string> - adds a string to the list and display it");
                 System.out.println("3. display - display the list");
                 System.out.println("4. count - returns the elements in the list");
@@ -150,7 +150,7 @@ public class Client {
                 if (request != null) {
                     System.out.println(request);
                     NetworkUtils.send(out, JsonUtils.toByteArray(request));
-                    byte[] responseBytes = NetworkUtils.receive(in);
+                   byte[] responseBytes = NetworkUtils.receive(in);
                     JSONObject response = JsonUtils.fromByteArray(responseBytes);
 
                     if (response.has("error")) {
