@@ -98,3 +98,69 @@ Base Code, please use the following commands:
 | **Run Task 3 (ThreadPoolServer) with custom limits** | `gradle runTask3 -Pport=9099 -Pthreads=3 -q --console=plain` |
 | **Run Client with a different server IP/port** | `gradle runClient -Phost=34.226.213.4 -Pport=9099 -q --console=plain` |
 
+## **Screencast Activity 1**
+
+🎥 **[Watch the Screencast Here](https://youtu.be/uBc_KfoQdBA)**
+
+### **📌 Screencast Overview**
+This screencast demonstrates the successful implementation of **Activity 1** by showcasing all **three tasks**:
+1. **Task 1:** Single-threaded Server
+2. **Task 2:** Multi-threaded Server (Unbounded)
+3. **Task 3:** Multi-threaded Server (Bounded to 2 Clients)
+
+### **🎬 What’s Covered in the Screencast?**
+
+1️⃣ **Gradle File Overview**
+- Show the **`build.gradle`** file and confirm the presence of:
+   - **3 separate tasks** (`runTask1`, `runTask2`, `runTask3`).
+   - **Default values** (`localhost`, port `8000`).
+   - `runClient` uses **default values** if no arguments are passed.
+
+2️⃣ **Task 1: Single-threaded Server**
+- Start the **single-threaded server** using:
+  ```bash
+  gradle runTask1 -q --console=plain
+  ```
+- Open **one client**:
+  ```bash
+  gradle runClient -q --console=plain
+  ```
+- **Test operations** (`add`, `display`, `count`, `quit`) and verify correct **state updates**.
+- **Quit** the client.
+
+3️⃣ **Task 2: Multi-threaded Server (Unbounded)**
+- Start the **multi-threaded server**:
+  ```bash
+  gradle runTask2 -q --console=plain
+  ```
+- Open **multiple clients simultaneously**:
+  ```bash
+  gradle runClient -q --console=plain
+  ```
+- Show that **each client operates independently** without affecting others.
+- Demonstrate **thread-safe behavior**:
+   - One client adds a string while another counts or displays the list.
+
+4️⃣ **Task 3: Multi-threaded Server (Bounded to 4 Clients)**
+- Start **ThreadPoolServer with a limit of 2 clients**:
+  ```bash
+  gradle runTask3 -Pthreads=2 -q --console=plain
+  ```
+- Open **2 clients** (all should connect successfully).
+- Attempt to **connect a 3th client** (should be rejected with a message:  
+  `"Server is at full capacity. Try again later."`).
+- Verify that **existing clients still function correctly**.
+
+5️⃣ **State Consistency Verification**
+- Run operations from different clients to ensure **state integrity**:
+   - **Client 1** adds a string.
+   - **Client 2** counts elements (verifies the addition).
+   - **Client 3** displays the updated list.
+- Confirm **no data is lost or overwritten incorrectly** between clients.
+
+6️⃣ **Final Recap & Summary**
+- **All 3 tasks work as expected**.
+- **Clients operate independently without interfering with each other**.
+- **Thread safety and concurrency work properly**.
+- **The bounded server correctly limits connections**.
+
