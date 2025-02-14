@@ -184,7 +184,7 @@ class SockBaseServer {
      * @param message - type Message from Protobuf which is the message to be written in the log (e.g. Connect) 
      * @return String of the new hidden image
      */
-    public void writeToLog(String name, Message message) {
+    public synchronized void writeToLog(String name, Message message) {
         try {
             // read old log file
             Logs.Builder logs = readLogFile();
@@ -252,7 +252,18 @@ class SockBaseServer {
                 System.out.println("Attempting to connect to client-" + id);
                 Game game = new Game();
                 SockBaseServer server = new SockBaseServer(clientSocket, game, id++);
-                server.startGame();
+                final int clientId = id; // Create final copy of id
+                id++; // Increment the original id
+
+                // Run each client in a separate thread
+                new Thread(() -> {
+                    try {
+                        server.startGame();
+                    } catch (IOException e) {
+                        System.out.println("Error handling client " + clientId);
+                    }
+                }).start();
+               // server.startGame();
             } catch (Exception e) {
                 System.out.println("Error in accepting client connection.");
             }
