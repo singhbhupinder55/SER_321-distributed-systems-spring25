@@ -9,9 +9,16 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import common.Player;
 
 class SockBaseServer {
     static String logFilename = "logs.txt";
+
+    private static final Object logLock = new Object();
+    private static final ConcurrentHashMap<String, Player> players = new ConcurrentHashMap<>();
+
 
     // Please use these as given so it works with our test cases
     static String menuOptions = "\nWhat would you like to do? \n 1 - to see the leader board \n 2 - to enter a game \n 3 - quit the game";
@@ -45,6 +52,44 @@ class SockBaseServer {
         }
     }
 
+    // Method to handle player login
+    private void handleLogin(String playerName) {
+        players.compute(playerName, (name, player) -> {
+            if (player == null) {
+                return new Player(name, 0); // First-time login, 0 wins
+            } else {
+                player.incrementLoginCount();
+
+            }
+            writeToLog(playerName, Message.CONNECT);
+            return player;
+        });
+
+    }
+
+
+    // Method to update player's score
+    private void updatePlayerScore(String playerName, int newScore) {
+        players.compute(playerName, (name, player) -> {
+            if (player == null) {
+                player = new Player(name, newScore); // First-time player
+            } else {
+                player.updateWins(newScore); // Overwrite only if new score is higher
+            }
+            writeToLog(playerName, Message.WIN);
+            return player;
+        });
+    }
+
+
+    // Method to display the leaderboard
+    private String getLeaderboard() {
+        return players.values().stream()
+                .sorted()
+                .map(Player::toString)
+                .collect(Collectors.joining("\n"));
+    }
+
     /**
      * Received a request, starts to evaluate what it is and handles it, not complete
      */
@@ -69,7 +114,12 @@ class SockBaseServer {
                         break;
                     case START:
                         response = startGame(op); // not complete!
-
+                        break;
+                    case LEADERBOARD:  // Handle leaderboard option
+                        response =   leaderboardRequest();
+                        break;
+                    case QUIT:  // Handle quit option
+                        response = quit();
                         break;
                     default:
                         response = error(2, op.getOperationType().name());
@@ -100,12 +150,44 @@ class SockBaseServer {
         if (serverSock != null) serverSock.close();
     }
 
+    private Response leaderboardRequest() {
+        Response.Builder response = Response.newBuilder()
+                .setResponseType(Response.ResponseType.LEADERBOARD)
+                .setMenuoptions(menuOptions)  // Show main menu again after displaying leaderboard
+                .setNext(2);
+
+        try {
+            Logs.Builder logs = readLogFile(); // Handle exception inside try-catch
+
+            if (logs.getLogList().isEmpty()) {
+                response.setMessage("\n🏆 Leaderboard is empty! No players have scores yet.");
+            } else {
+                StringBuilder leaderboard = new StringBuilder("\n🏆 Leaderboard 🏆\n");
+
+                for (String logEntry : logs.getLogList()) {  // Correct handling of Protobuf strings
+                   leaderboard.append("• ").append(logEntry).append("\n");
+                }
+
+                response.setMessage(leaderboard.toString());
+            }
+
+        } catch (Exception e) {
+            System.out.println("⚠️ Error reading leaderboard file: " + e.getMessage());
+            response.setMessage("\n⚠️ Error retrieving leaderboard. Please try again.");
+        }
+
+        return response.build();
+    }
+
+
+
     /**
      * Handles the name request and returns the appropriate response
      * @return Request.Builder holding the reponse back to Client as specified in Protocol
      */
     private Response nameRequest(Request op) throws IOException {
         name = op.getName();
+
 
         writeToLog(name, Message.CONNECT);
         currentState = 2;
@@ -131,6 +213,10 @@ class SockBaseServer {
         System.out.println(game.getDisplayBoard());
 
         return Response.newBuilder()
+                .setResponseType(Response.ResponseType.START)
+                .setMessage("\nGame started! Play your turn...")
+                .setMenuoptions(gameOptions) //  Sends in-game menu
+                .setNext(3)
                 .build();
     }
 
@@ -157,13 +243,16 @@ class SockBaseServer {
 
         switch (err) {
             case 1:
-                message = "\nError: required field missing or empty";
+                message = "\n⚠️ Error: A required field is missing or empty. Please check your input.";
                 break;
             case 2:
-                message = "\nError: request not supported";
+                message = "\n⚠️ Error: Request not supported. Please choose a valid option.";
                 break;
+            case 3:
+                message = "\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9.";
+            break;
             default:
-                message = "\nError: cannot process your request";
+                message = "\n⚠️ Error: Unexpected issue occurred. Please try again.";
                 type = 0;
                 break;
         }
@@ -177,11 +266,11 @@ class SockBaseServer {
 
         return response.build();
     }
-    
+
     /**
      * Writing a new entry to our log
      * @param name - Name of the person logging in
-     * @param message - type Message from Protobuf which is the message to be written in the log (e.g. Connect) 
+     * @param message - type Message from Protobuf which is the message to be written in the log (e.g. Connect)
      * @return String of the new hidden image
      */
     public synchronized void writeToLog(String name, Message message) {
@@ -251,9 +340,11 @@ class SockBaseServer {
                 clientSocket = socket.accept();
                 System.out.println("Attempting to connect to client-" + id);
                 Game game = new Game();
-                SockBaseServer server = new SockBaseServer(clientSocket, game, id++);
                 final int clientId = id; // Create final copy of id
                 id++; // Increment the original id
+
+                SockBaseServer server = new SockBaseServer(clientSocket, game, clientId);
+
 
                 // Run each client in a separate thread
                 new Thread(() -> {

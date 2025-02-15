@@ -43,15 +43,25 @@ class SockBaseClient {
             while (true) {
                 // read from the server
                 response = Response.parseDelimitedFrom(in);
-                System.out.println("Got a response: " + response.toString());
+              //  System.out.println("Got a response: " + response.toString());
 
                 Request.Builder req = Request.newBuilder();
 
                 switch (response.getResponseType()) {
                     case GREETING:
+                        System.out.println("\n========================================================");
                         System.out.println(response.getMessage());
+                        System.out.println("======================================================");
                         req = chooseMenu(req, response);
                         break;
+
+                    case LEADERBOARD:
+                        System.out.println("\n================== 🏆 Leaderboard 🏆 ==================");
+                        System.out.println(response.getMessage());
+                        System.out.println("======================================================\n");
+                        req = chooseMenu(req, response); // Ensures menu is shown again
+                        break;
+
                     case ERROR:
                         System.out.println("Error: " + response.getMessage() + "Type: " + response.getErrorType());
                         if (response.getNext() == 1) {
@@ -91,18 +101,26 @@ class SockBaseClient {
      */
     static Request.Builder chooseMenu(Request.Builder req, Response response) throws IOException {
         while (true) {
+            System.out.println("\n==================== Main Menu ====================");
             System.out.println(response.getMenuoptions());
+            System.out.println("==================================================");
             System.out.print("Enter a number 1-3: ");
             BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
             String menu_select = stdin.readLine();
             System.out.println(menu_select);
             switch (menu_select) {
+                case "1":
+                req.setOperationType(Request.OperationType.LEADERBOARD);
+                return req;
                 // needs to include the other requests
                 case "2":
                     req.setOperationType(Request.OperationType.START); // this is not a complete START request!! Just as example
                     return req;
+                case "3":
+                    req.setOperationType(Request.OperationType.QUIT);
+                    return req;
                 default:
-                    System.out.println("\nNot a valid choice, please choose again");
+                    System.out.println("\nInvalid choice! Please enter a valid option (1, 2, or 3).");
                     break;
             }
         }
