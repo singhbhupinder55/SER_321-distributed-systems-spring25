@@ -54,12 +54,14 @@ class SockBaseServer {
 
     // Method to handle player login
     private void handleLogin(String playerName) {
+
         players.compute(playerName, (name, player) -> {
             if (player == null) {
-                return new Player(name, 0); // First-time login, 0 wins
+                // New player, initialize with 1 login
+                player = new Player(name, 0);
+                player.setLoginCount(1);
             } else {
-                player.incrementLoginCount();
-
+                player.incrementLoginCount(); // Increase login count
             }
             writeToLog(playerName, Message.CONNECT);
             return player;
@@ -67,9 +69,9 @@ class SockBaseServer {
 
     }
 
-
     // Method to update player's score
     private void updatePlayerScore(String playerName, int newScore) {
+
         players.compute(playerName, (name, player) -> {
             if (player == null) {
                 player = new Player(name, newScore); // First-time player
@@ -79,16 +81,10 @@ class SockBaseServer {
             writeToLog(playerName, Message.WIN);
             return player;
         });
+
     }
 
 
-    // Method to display the leaderboard
-    private String getLeaderboard() {
-        return players.values().stream()
-                .sorted()
-                .map(Player::toString)
-                .collect(Collectors.joining("\n"));
-    }
 
     /**
      * Received a request, starts to evaluate what it is and handles it, not complete
@@ -164,9 +160,13 @@ class SockBaseServer {
             } else {
                 StringBuilder leaderboard = new StringBuilder("\n🏆 Leaderboard 🏆\n");
 
+
                 for (String logEntry : logs.getLogList()) {  // Correct handling of Protobuf strings
                    leaderboard.append("• ").append(logEntry).append("\n");
                 }
+
+
+
 
                 response.setMessage(leaderboard.toString());
             }
@@ -186,8 +186,7 @@ class SockBaseServer {
      * @return Request.Builder holding the reponse back to Client as specified in Protocol
      */
     private Response nameRequest(Request op) throws IOException {
-        name = op.getName();
-
+        name = op.getName().toUpperCase();
 
         writeToLog(name, Message.CONNECT);
         currentState = 2;
@@ -206,15 +205,33 @@ class SockBaseServer {
      */
     private Response startGame(Request op) throws IOException {
 
-        System.out.println("start game");
+        if (!op.hasDifficulty()) {
+            return error(1, "Difficulty level is missing.");
+        }
 
-        game.newGame(grading, 4); // difficulty should be read from request!
+        int difficulty = op.getDifficulty(); // Read difficulty from client request
+
+
+        // Loop until a valid difficulty is received
+        if (difficulty < 1 || difficulty > 20) {
+            System.out.println("Invalid difficulty received: " + difficulty + ". Asking client for valid input.");
+            // Send an error response asking for a valid difficulty
+                    return Response.newBuilder()
+                    .setResponseType(Response.ResponseType.ERROR)
+                    .setErrorType(5)
+                    .setMessage("\n⚠️ Error: Invalid difficulty! Please enter a number between 1-20.")
+                    .setNext(2)  // Stay in the same menu
+                    .build();
+
+        }
+        System.out.println("Starting game with difficulty: " + difficulty);
+        game.newGame(grading, difficulty); // difficulty should be read from request!
 
         System.out.println(game.getDisplayBoard());
 
         return Response.newBuilder()
                 .setResponseType(Response.ResponseType.START)
-                .setMessage("\nGame started! Play your turn...")
+                .setMessage(game.getDisplayBoard())
                 .setMenuoptions(gameOptions) //  Sends in-game menu
                 .setNext(3)
                 .build();
@@ -251,6 +268,9 @@ class SockBaseServer {
             case 3:
                 message = "\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9.";
             break;
+            case 4:
+                message = "\n⚠️ Error: Invalid difficulty! Please enter a number between 1-20.";
+                break;
             default:
                 message = "\n⚠️ Error: Unexpected issue occurred. Please try again.";
                 type = 0;
@@ -278,11 +298,30 @@ class SockBaseServer {
             // read old log file
             Logs.Builder logs = readLogFile();
 
+
             Date date = java.util.Calendar.getInstance().getTime();
+            // Ensure the player exists
+            Player player = players.computeIfAbsent(name, k -> new Player(name, 0));
+
+            if (message == Message.CONNECT) {
+               player.incrementLoginCount();
+            }
+
+
+            // Remove any previous log entry of this player
+            logs.getLogList().removeIf(logEntry -> logEntry.contains(" - " + name + " - "));
 
             // we are writing a new log entry to our log
             // add a new log entry to the log list of the Protobuf object
-            logs.addLog(date + ": " +  name + " - " + message);
+
+
+            // Create log format: "DATE - NAME - WINS: X - LOGINS: Y - ACTION"
+            String logEntry = String.format("%s - %s - Wins: %d - Logins: %d - %s",
+                    date, name, player.getWins(), player.getLoginCount(), message);
+
+            // Add new entry
+            logs.addLog(logEntry);
+
 
             // open log file
             FileOutputStream output = new FileOutputStream(logFilename);
@@ -290,25 +329,30 @@ class SockBaseServer {
 
             // write to log file
             logsObj.writeTo(output);
+
         } catch(Exception e) {
             System.out.println("Issue while trying to save");
         }
     }
 
-    /**
-     * Reading the current log file
-     * @return Logs.Builder a builder of a logs entry from protobuf
-     */
-    public Logs.Builder readLogFile() throws Exception {
-        Logs.Builder logs = Logs.newBuilder();
 
-        try {
-            return logs.mergeFrom(new FileInputStream(logFilename));
-        } catch (FileNotFoundException e) {
-            System.out.println(logFilename + ": File not found.  Creating a new file.");
-            return logs;
+    public synchronized Logs.Builder readLogFile() throws Exception {
+        synchronized (logLock) {
+            Logs.Builder logs = Logs.newBuilder();
+
+            try {
+                // just read the file and put what is in it into the logs object
+                return logs.mergeFrom(new FileInputStream(logFilename));
+            } catch (FileNotFoundException e) {
+                System.out.println(logFilename + ": File not found.  Creating a new file.");
+                return logs;
+            }
         }
     }
+
+
+
+
 
 
     public static void main (String[] args) throws Exception {

@@ -62,13 +62,34 @@ class SockBaseClient {
                         req = chooseMenu(req, response); // Ensures menu is shown again
                         break;
 
+                    case START:
+                        // ✅ Display the board received from the server
+                        System.out.println("\n================== 🧩 Sudoku Board ==================");
+                        System.out.println(response.getMessage());  // This contains the board
+                        System.out.println("====================================================");
+
+                        req = chooseMenu(req, response);
+
+                        break;
+
+
                     case ERROR:
                         System.out.println("Error: " + response.getMessage() + "Type: " + response.getErrorType());
-                        if (response.getNext() == 1) {
-                            req = nameRequest();
-                        } else {
-                            System.out.println("That error type is not handled yet");
-                            req = nameRequest();
+                        switch (response.getErrorType()) {
+                            case 1: // Required field missing
+                                req = nameRequest();
+                                break;
+                            case 5: // ✅ Handle difficulty out of range error
+                                System.out.print("\nPlease enter a valid difficulty (1 - 20): ");
+                                BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+                                String difficultyStr = stdin.readLine();
+                                req.setOperationType(Request.OperationType.START);
+                                req.setDifficulty(Integer.parseInt(difficultyStr)); // Send new difficulty to server
+                                break;
+                            default:
+                                System.out.println("That error type is not handled yet");
+                                req = nameRequest();
+                                break;
                         }
                         break;
                 }
@@ -101,7 +122,7 @@ class SockBaseClient {
      */
     static Request.Builder chooseMenu(Request.Builder req, Response response) throws IOException {
         while (true) {
-            System.out.println("\n==================== Main Menu ====================");
+            System.out.println("\n==================================================");
             System.out.println(response.getMenuoptions());
             System.out.println("==================================================");
             System.out.print("Enter a number 1-3: ");
@@ -114,7 +135,10 @@ class SockBaseClient {
                 return req;
                 // needs to include the other requests
                 case "2":
-                    req.setOperationType(Request.OperationType.START); // this is not a complete START request!! Just as example
+                    System.out.print("\nEnter difficulty level (1 - 20): ");
+                    String difficultyStr = stdin.readLine();  // Get difficulty input from use
+                    req.setOperationType(Request.OperationType.START);
+                    req.setDifficulty(Integer.parseInt(difficultyStr)); // Send difficulty to server
                     return req;
                 case "3":
                     req.setOperationType(Request.OperationType.QUIT);

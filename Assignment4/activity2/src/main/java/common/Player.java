@@ -17,7 +17,7 @@ public class Player implements Comparable<Player> {
     public Player(String name, int wins){
       this.wins = wins;
       this.name = name;
-      this.loginCount = 1; // Initialize login count to 1 upon first creation
+      this.loginCount = 0; // Initialize login count to 1 upon first creation
     }
 
     public int getWins(){
