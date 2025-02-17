@@ -117,6 +117,11 @@ class SockBaseServer {
                     case QUIT:  // Handle quit option
                         response = quit();
                         break;
+
+                    case UPDATE:
+                        response = processMove(op);
+                        break;
+
                     default:
                         response = error(2, op.getOperationType().name());
                         break;
@@ -220,7 +225,7 @@ class SockBaseServer {
                     .setResponseType(Response.ResponseType.ERROR)
                     .setErrorType(5)
                     .setMessage("\n⚠️ Error: Invalid difficulty! Please enter a number between 1-20.")
-                    .setNext(2)  // Stay in the same menu
+                    .setNext(4)  // Stay in the same menu
                     .build();
 
         }
@@ -253,23 +258,36 @@ class SockBaseServer {
      * Start of handling errors, not fully done
      * @return Request.Builder holding the reponse back to Client as specified in Protocol
      */
-    private Response error(int err, String field) throws IOException {
+    private Response error(int err, String field)    //throws IOException
+    {
         String message = "";
         int type = err;
         Response.Builder response = Response.newBuilder();
+       int nextStep = currentState;
+
 
         switch (err) {
             case 1:
-                message = "\n⚠️ Error: A required field is missing or empty. Please check your input.";
+                message = "\n⚠️ Error: A required field is missing or empty.";
                 break;
             case 2:
-                message = "\n⚠️ Error: Request not supported. Please choose a valid option.";
+                message = "\n⚠️ Error: Request not supported.";
                 break;
             case 3:
                 message = "\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9.";
-            break;
+                nextStep = 3;
+                break;
             case 4:
-                message = "\n⚠️ Error: Invalid difficulty! Please enter a number between 1-20.";
+                message = "\n⚠️ Error: This request is not expected at this point.";
+                break;
+            case 5:
+                message = "\n⚠️ Error: Difficulty is out of range. Please enter a value between 1-20.";
+                break;
+            case 6:
+                message = "\n⚠️ Error: You cannot modify a pre-filled number!";
+                break;
+            case 7:
+                message = "\n⚠️ Error: Invalid move! The number already exists in row, column, or grid.";
                 break;
             default:
                 message = "\n⚠️ Error: Unexpected issue occurred. Please try again.";
@@ -286,6 +304,86 @@ class SockBaseServer {
 
         return response.build();
     }
+
+    private Response processMove(Request op) {
+
+        System.out.println("Processing move: Row=" + op.getRow() + ", Column=" + op.getColumn() + ", Value=" + op.getValue());
+
+        // Check if fields are missing
+        if (!op.hasRow() || !op.hasColumn() || !op.hasValue()) {
+            return error(1, "A required field is missing or empty.");
+        }
+
+        int row = op.getRow() - 1;  // Convert to 0-based index
+        int col = op.getColumn() - 1;
+        int value = op.getValue();
+
+        // ✅ Step 1: Validate if the move is inside the board boundaries
+        if (row < 0 || row >= 9 || col < 0 || col >= 9 || value < 1 || value > 9) {
+            return Response.newBuilder()
+                    .setResponseType(Response.ResponseType.ERROR)
+                    .setErrorType(3)
+                    .setMessage("\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9.")
+                    .setNext(3)  // ✅ Stay in the game
+                    .build();
+        }
+
+        // ✅ Step 2: Update board using `updateBoard()`
+        int result = game.updateBoard(row, col, value, 0); // 0 means add number
+
+        // ✅ Step 3: Handle errors returned from `updateBoard()`
+        switch (result) {
+            case 1:
+                return Response.newBuilder()
+                        .setResponseType(Response.ResponseType.ERROR)
+                        .setErrorType(6)
+                        .setMessage("\n⚠️ Error: You cannot modify a pre-filled number!")
+                        .setNext(3)  // ✅ Stay in the game
+                        .build();
+            case 2:
+                return Response.newBuilder()
+                        .setResponseType(Response.ResponseType.ERROR)
+                        .setErrorType(7)
+                        .setMessage("\n⚠️ Error: The number already exists in the row!")
+                        .setNext(3)  // ✅ Stay in the game
+                        .build();
+            case 3:
+                return Response.newBuilder()
+                        .setResponseType(Response.ResponseType.ERROR)
+                        .setErrorType(7)
+                        .setMessage("\n⚠️ Error: The number already exists in the column!")
+                        .setNext(3)  // ✅ Stay in the game
+                        .build();
+            case 4:
+                return Response.newBuilder()
+                        .setResponseType(Response.ResponseType.ERROR)
+                        .setErrorType(7)
+                        .setMessage("\n⚠️ Error: The number already exists in the 3x3 grid!")
+                        .setNext(3)  // ✅ Stay in the game
+                        .build();
+        }
+
+        // ✅ Step 4: Check if the player has won
+        if (game.checkWon()) {
+            return Response.newBuilder()
+                    .setResponseType(Response.ResponseType.WON)
+                    .setMessage("🎉 Congratulations! You completed the Sudoku puzzle! 🎉")
+                    .setMenuoptions(menuOptions) // Back to the main menu
+                    .setNext(2)
+                    .build();
+        }
+
+        // ✅ Step 5: Send updated board
+        return Response.newBuilder()
+                .setResponseType(Response.ResponseType.PLAY)
+                .setMessage(game.getDisplayBoard())
+                .setMenuoptions(gameOptions) // In-game menu
+                .setNext(3)  // ✅ Stay in the game
+                .build();
+    }
+
+
+
 
     /**
      * Writing a new entry to our log

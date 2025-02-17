@@ -68,27 +68,61 @@ class SockBaseClient {
                         System.out.println(response.getMessage());  // This contains the board
                         System.out.println("====================================================");
 
-                        req = chooseMenu(req, response);
+                        System.out.println(response.getMenuoptions());
 
+                        int[] move = getValidatedMove();  // Get user input
+                        req.setOperationType(Request.OperationType.UPDATE);
+                        req.setRow(move[0]);
+                        req.setColumn(move[1]);
+                        req.setValue(move[2]);
                         break;
+
+                    case PLAY:
+                        System.out.println("\n================== 🧩 Updated Sudoku Board ==================");
+                        System.out.println(response.getMessage());  // Display updated board
+                        System.out.println("====================================================");
+                        System.out.println(response.getMenuoptions()); // Show in-game menu
+
+                        System.out.println(response.getMenuoptions());
+
+                        // Ask for the next move
+                        int[] nextMove = getValidatedMove();
+                        req.setOperationType(Request.OperationType.UPDATE);
+                        req.setRow(nextMove[0]);
+                        req.setColumn(nextMove[1]);
+                        req.setValue(nextMove[2]);
+                        break;
+
 
 
                     case ERROR:
                         System.out.println("Error: " + response.getMessage() + "Type: " + response.getErrorType());
-                        switch (response.getErrorType()) {
-                            case 1: // Required field missing
-                                req = nameRequest();
+
+                        switch (response.getNext()) {
+                            case 1:
+                                req = nameRequest(); // Go back to name request
                                 break;
-                            case 5: // ✅ Handle difficulty out of range error
+                            case 2:
+                                req = chooseMenu(Request.newBuilder(), response); // Go back to main menu
+                                break;
+                            case 3:
+                                // If in-game, prompt user for another move
+                                int[] retryMove = getValidatedMove();
+                                req.setOperationType(Request.OperationType.UPDATE);
+                                req.setRow(retryMove[0]);
+                                req.setColumn(retryMove[1]);
+                                req.setValue(retryMove[2]);
+                                break;
+                            case 4:
                                 System.out.print("\nPlease enter a valid difficulty (1 - 20): ");
                                 BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
                                 String difficultyStr = stdin.readLine();
                                 req.setOperationType(Request.OperationType.START);
-                                req.setDifficulty(Integer.parseInt(difficultyStr)); // Send new difficulty to server
+                                req.setDifficulty(Integer.parseInt(difficultyStr));
                                 break;
                             default:
-                                System.out.println("That error type is not handled yet");
-                                req = nameRequest();
+                                System.out.println("Unexpected error state, returning to main menu.");
+                                req = chooseMenu(Request.newBuilder(), response);
                                 break;
                         }
                         break;
@@ -143,6 +177,7 @@ class SockBaseClient {
                 case "3":
                     req.setOperationType(Request.OperationType.QUIT);
                     return req;
+
                 default:
                     System.out.println("\nInvalid choice! Please enter a valid option (1, 2, or 3).");
                     break;
@@ -361,4 +396,50 @@ class SockBaseClient {
 
         return coordinates;
     }
+
+    /**
+     * Handles requesting user input for move in the Sudoku game with clear instructions and validation.
+     */
+    static int[] getValidatedMove() throws IOException {
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        String input;
+        System.out.println("\n   Enter your move in the format: row column value");
+        System.out.println("   Example: 3 4 7 (to place number 7 at row 3, column 4)");
+        System.out.println("   Row and Column should be between 1 and 9, Value should be between 1 and 9.");
+        System.out.println("==================================================\n");
+
+        while (true) {
+            System.out.print("Enter row, column, and value: \n");
+            input = stdin.readLine();
+            if (isValidInput(input)) {
+                break;
+            }
+            System.out.println("\n Invalid input! Please enter three numbers separated by spaces (e.g., 3 4 7).");
+        }
+
+        String[] parts = input.split(" ");
+        return new int[]{Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2])};
+    }
+
+    /**
+     * Validates the user input for move format correctness.
+     */
+    static boolean isValidInput(String input) {
+        String[] parts = input.trim().split("\\s+");
+        if (parts.length != 3) {
+            System.out.println("❌ **Invalid format!** Please enter three numbers separated by spaces (e.g., 3 4 7).");
+            return false;
+        }
+
+        try {
+            Integer.parseInt(parts[0]);
+            Integer.parseInt(parts[1]);
+            Integer.parseInt(parts[2]);
+            return true;
+        } catch (NumberFormatException e) {
+            System.out.println("❌ **Invalid input!** All inputs must be Integers.");
+            return false;
+        }
+    }
+
 }
