@@ -116,6 +116,7 @@ class SockBaseServer {
                         break;
                     case QUIT:  // Handle quit option
                         response = quit();
+                        quit = true;
                         break;
 
                     case UPDATE:
@@ -230,6 +231,8 @@ class SockBaseServer {
 
         }
         System.out.println("Starting game with difficulty: " + difficulty);
+        this.inGame = false;
+        this.game = new Game(); // Reinitialize game object
         game.newGame(grading, difficulty); // difficulty should be read from request!
 
         System.out.println(game.getDisplayBoard());
@@ -247,6 +250,7 @@ class SockBaseServer {
      * @return Request.Builder holding the reponse back to Client as specified in Protocol
      */
     private  Response quit() throws IOException {
+        System.out.println("Client " + name + " has chosen to quit the game.");
         this.inGame = false;
         return Response.newBuilder()
                 .setResponseType(Response.ResponseType.BYE)
@@ -328,42 +332,42 @@ class SockBaseServer {
                     .build();
         }
 
-        // ✅ Step 2: Update board using `updateBoard()`
+        //  Step 2: Update board using `updateBoard()`
         int result = game.updateBoard(row, col, value, 0); // 0 means add number
 
-        // ✅ Step 3: Handle errors returned from `updateBoard()`
+        //  Step 3: Handle errors returned from `updateBoard()`
         switch (result) {
             case 1:
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(6)
                         .setMessage("\n⚠️ Error: You cannot modify a pre-filled number!")
-                        .setNext(3)  // ✅ Stay in the game
+                        .setNext(3)  //  Stay in the game
                         .build();
             case 2:
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
                         .setMessage("\n⚠️ Error: The number already exists in the row!")
-                        .setNext(3)  // ✅ Stay in the game
+                        .setNext(3)  //  Stay in the game
                         .build();
             case 3:
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
                         .setMessage("\n⚠️ Error: The number already exists in the column!")
-                        .setNext(3)  // ✅ Stay in the game
+                        .setNext(3)  //  Stay in the game
                         .build();
             case 4:
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
                         .setMessage("\n⚠️ Error: The number already exists in the 3x3 grid!")
-                        .setNext(3)  // ✅ Stay in the game
+                        .setNext(3)  //  Stay in the game
                         .build();
         }
 
-        // ✅ Step 4: Check if the player has won
+        //  Step 4: Check if the player has won
         if (game.checkWon()) {
             return Response.newBuilder()
                     .setResponseType(Response.ResponseType.WON)
@@ -373,7 +377,7 @@ class SockBaseServer {
                     .build();
         }
 
-        // ✅ Step 5: Send updated board
+        //  Step 5: Send updated board
         return Response.newBuilder()
                 .setResponseType(Response.ResponseType.PLAY)
                 .setMessage(game.getDisplayBoard())

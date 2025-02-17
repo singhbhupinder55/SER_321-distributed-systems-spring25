@@ -83,16 +83,29 @@ class SockBaseClient {
                         System.out.println("====================================================");
                         System.out.println(response.getMenuoptions()); // Show in-game menu
 
-                        System.out.println(response.getMenuoptions());
-
                         // Ask for the next move
                         int[] nextMove = getValidatedMove();
+                        if (nextMove[0] == -1) {
+                            req.setOperationType(Request.OperationType.QUIT);
+                        } else {
                         req.setOperationType(Request.OperationType.UPDATE);
                         req.setRow(nextMove[0]);
                         req.setColumn(nextMove[1]);
                         req.setValue(nextMove[2]);
+                        }
                         break;
 
+
+                    case WON:
+                        System.out.println("\n🎉🎉🎉 CONGRATULATIONS! 🎉🎉🎉");
+                        System.out.println(response.getMessage());
+                        System.out.println("====================================================");
+                        chooseMenu(Request.newBuilder(), response);
+                        return; // Exit game after win
+
+                    case BYE:
+                        System.out.println("\n👋 Thank you for playing! Goodbye.");
+                        return; // Exit client loop after quitting
 
 
                     case ERROR:
@@ -406,11 +419,20 @@ class SockBaseClient {
         System.out.println("\n   Enter your move in the format: row column value");
         System.out.println("   Example: 3 4 7 (to place number 7 at row 3, column 4)");
         System.out.println("   Row and Column should be between 1 and 9, Value should be between 1 and 9.");
+        System.out.println("   Type 'exit' to quit the game.");
         System.out.println("==================================================\n");
 
         while (true) {
-            System.out.print("Enter row, column, and value: \n");
-            input = stdin.readLine();
+            System.out.print("Enter row, column, and value (or 'exit' to quit): \n");
+            input = stdin.readLine().trim();
+
+            if (input.equalsIgnoreCase("exit")) {
+                System.out.println("\n Exiting game... Sending QUIT request.");
+                Request quitRequest = Request.newBuilder()
+                        .setOperationType(Request.OperationType.QUIT)
+                        .build();
+                return new int[]{-1, -1, -1};  // Special signal for QUIT
+            }
             if (isValidInput(input)) {
                 break;
             }
