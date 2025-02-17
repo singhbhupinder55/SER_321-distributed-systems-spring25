@@ -249,7 +249,8 @@ class SockBaseServer {
      * Handles the quit request, might need adaptation
      * @return Request.Builder holding the reponse back to Client as specified in Protocol
      */
-    private  Response quit() throws IOException {
+    private  Response quit() //throws IOException
+    {
         System.out.println("Client " + name + " has chosen to quit the game.");
         this.inGame = false;
         return Response.newBuilder()
@@ -312,6 +313,11 @@ class SockBaseServer {
     private Response processMove(Request op) {
 
         System.out.println("Processing move: Row=" + op.getRow() + ", Column=" + op.getColumn() + ", Value=" + op.getValue());
+
+        // ✅ If the client is trying to quit, handle it separately
+        if (op.getRow() == -1 && op.getColumn() == -1 && op.getValue() == -1) {
+            return quit();
+        }
 
         // Check if fields are missing
         if (!op.hasRow() || !op.hasColumn() || !op.hasValue()) {

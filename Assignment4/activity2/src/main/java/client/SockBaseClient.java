@@ -71,10 +71,14 @@ class SockBaseClient {
                         System.out.println(response.getMenuoptions());
 
                         int[] move = getValidatedMove();  // Get user input
-                        req.setOperationType(Request.OperationType.UPDATE);
-                        req.setRow(move[0]);
-                        req.setColumn(move[1]);
-                        req.setValue(move[2]);
+                        if (move == null) {  // ✅ If 'exit' was entered, send a QUIT request
+                            req.setOperationType(Request.OperationType.QUIT);
+                        } else {
+                            req.setOperationType(Request.OperationType.UPDATE);
+                            req.setRow(move[0]);
+                            req.setColumn(move[1]);
+                            req.setValue(move[2]);
+                        }
                         break;
 
                     case PLAY:
@@ -431,7 +435,7 @@ class SockBaseClient {
                 Request quitRequest = Request.newBuilder()
                         .setOperationType(Request.OperationType.QUIT)
                         .build();
-                return new int[]{-1, -1, -1};  // Special signal for QUIT
+                return null;  // Special signal for QUIT
             }
             if (isValidInput(input)) {
                 break;
