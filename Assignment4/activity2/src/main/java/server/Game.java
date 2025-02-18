@@ -436,4 +436,41 @@ public class Game {
     public int setPoints(int diff) {
         return points += diff;
     }
+
+    public boolean clearRow(int row) {
+        if (row < 0 || row >= 9) return false;
+        for (int col = 0; col < 9; col++) {
+            if (referenceBoard[row][col] == 'X') playerBoard[row][col] = 'X';
+        }
+        return true;
+    }
+
+    public boolean clearColumn(int col) {
+        if (col < 0 || col >= 9) return false;
+        for (int row = 0; row < 9; row++) {
+            if (referenceBoard[row][col] == 'X') playerBoard[row][col] = 'X';
+        }
+        return true;
+    }
+
+    public boolean clearGrid(int grid) {
+        int startRow = (grid / 3) * 3;
+        int startCol = (grid % 3) * 3;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (referenceBoard[startRow + i][startCol + j] == 'X')
+                    playerBoard[startRow + i][startCol + j] = 'X';
+            }
+        }
+        return true;
+    }
+
+    public void resetBoard() {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (referenceBoard[i][j] == 'X') playerBoard[i][j] = 'X';
+            }
+        }
+    }
+
 }

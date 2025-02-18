@@ -12,12 +12,14 @@ public class Player implements Comparable<Player> {
     private int wins;
     private String name;
     private int loginCount; // Track how often the player has logged in
+    private int points;
 
     // constructor, getters, setters
     public Player(String name, int wins){
       this.wins = wins;
       this.name = name;
       this.loginCount = 0; // Initialize login count to 1 upon first creation
+        this.points = 0; // Start every game at 0 points
     }
 
     public int getWins(){
@@ -58,4 +60,17 @@ public class Player implements Comparable<Player> {
         return String.format("%s: %d wins, %d logins", name, wins, loginCount);
         //return ("\n" +this.wins + ": " + this.name);
        }
+
+    // Add this method to update player points
+    public void updatePoints(int delta) {
+        this.points += delta;
+    }
+
+    // Add a getter for points
+    public int getPoints() {
+        return this.points;
+    }
+    public void resetPoints() {
+        this.points = 0; //  Reset points when a new game starts
+    }
 }

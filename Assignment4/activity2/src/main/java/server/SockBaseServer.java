@@ -30,6 +30,8 @@ class SockBaseServer {
     OutputStream out = null;
     Socket clientSocket = null;
     private final int id; // client id
+    private int lastDifficulty = 1;  //  Stores the last chosen difficulty, default to 1
+
 
     Game game; // current game
 
@@ -52,22 +54,6 @@ class SockBaseServer {
         }
     }
 
-    // Method to handle player login
-    private void handleLogin(String playerName) {
-
-        players.compute(playerName, (name, player) -> {
-            if (player == null) {
-                // New player, initialize with 1 login
-                player = new Player(name, 0);
-                player.setLoginCount(1);
-            } else {
-                player.incrementLoginCount(); // Increase login count
-            }
-            writeToLog(playerName, Message.CONNECT);
-            return player;
-        });
-
-    }
 
     // Method to update player's score
     private void updatePlayerScore(String playerName, int newScore) {
@@ -83,6 +69,7 @@ class SockBaseServer {
         });
 
     }
+
 
 
 
@@ -123,6 +110,10 @@ class SockBaseServer {
                         response = processMove(op);
                         break;
 
+                    case CLEAR: // <-- ADD THIS
+                        response = clearBoard(op); // Use the existing method
+                        break;
+
                     default:
                         response = error(2, op.getOperationType().name());
                         break;
@@ -145,6 +136,7 @@ class SockBaseServer {
             exitAndClose(in, out, clientSocket);
         }
     }
+
 
     void exitAndClose(InputStream in, OutputStream out, Socket serverSock) throws IOException {
         if (in != null)   in.close();
@@ -193,9 +185,21 @@ class SockBaseServer {
      */
     private Response nameRequest(Request op) throws IOException {
         name = op.getName().toUpperCase();
-
-        writeToLog(name, Message.CONNECT);
         currentState = 2;
+
+        //  Check if player already exists in the system
+        Player player = players.compute(name, (key, existingPlayer) -> {
+            if (existingPlayer == null) {
+                Player newPlayer = new Player(name, 0);
+                newPlayer.setLoginCount(1);
+                return newPlayer;
+            } else {
+                existingPlayer.incrementLoginCount();
+                return existingPlayer;
+            }
+        });
+            writeToLog(name, Message.CONNECT);
+
 
         System.out.println("Got a connection and a name: " + name);
         return Response.newBuilder()
@@ -215,7 +219,19 @@ class SockBaseServer {
             return error(1, "Difficulty level is missing.");
         }
 
-        int difficulty = op.getDifficulty(); // Read difficulty from client request
+        int difficulty;
+          try {
+              difficulty = op.getDifficulty();
+          } catch (NumberFormatException nfe) {
+              System.out.println("Invalid difficulty received. Asking client for valid input.");
+              return Response.newBuilder()
+                      .setResponseType(Response.ResponseType.ERROR)
+                      .setErrorType(5)
+                      .setMessage("\n⚠️ Error: Invalid difficulty! Please enter a number between 1-20.")
+                      .setNext(4)  // Stay in the same menu
+                      .build();
+
+          }
 
 
         // Loop until a valid difficulty is received
@@ -231,6 +247,7 @@ class SockBaseServer {
 
         }
         System.out.println("Starting game with difficulty: " + difficulty);
+        lastDifficulty = difficulty;
         this.inGame = false;
         this.game = new Game(); // Reinitialize game object
         game.newGame(grading, difficulty); // difficulty should be read from request!
@@ -300,6 +317,7 @@ class SockBaseServer {
                 break;
         }
 
+
         response
                 .setResponseType(Response.ResponseType.ERROR)
                 .setErrorType(type)
@@ -308,16 +326,32 @@ class SockBaseServer {
                 .build();
 
         return response.build();
+
+
+
     }
 
     private Response processMove(Request op) {
 
         System.out.println("Processing move: Row=" + op.getRow() + ", Column=" + op.getColumn() + ", Value=" + op.getValue());
 
-        // ✅ If the client is trying to quit, handle it separately
+        //  If the client is trying to quit, handle it separately
         if (op.getRow() == -1 && op.getColumn() == -1 && op.getValue() == -1) {
             return quit();
         }
+
+        //  If the client requests to clear the board (cb)
+        if (op.getRow() == -2 && op.getColumn() == -2 && op.getValue() == -2) {
+            return clearBoard(Request.newBuilder().setValue(5).build());  // Call clearBoard with value 5
+        }
+
+        //  If the client requests a new board (r)
+        if (op.getRow() == -3 && op.getColumn() == -3 && op.getValue() == -3) {
+            System.out.println("🔄 Generating a new board with difficulty " + lastDifficulty);
+            return startNewBoard();
+
+        }
+
 
         // Check if fields are missing
         if (!op.hasRow() || !op.hasColumn() || !op.hasValue()) {
@@ -333,62 +367,170 @@ class SockBaseServer {
             return Response.newBuilder()
                     .setResponseType(Response.ResponseType.ERROR)
                     .setErrorType(3)
-                    .setMessage("\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9.")
-                    .setNext(3)  // ✅ Stay in the game
+                    .setMessage("\n⚠️ Error: Row or column out of bounds. Please enter values between 1-9. (-2 points)")
+                    .setNext(3)  //  Stay in the game
                     .build();
         }
 
         //  Step 2: Update board using `updateBoard()`
         int result = game.updateBoard(row, col, value, 0); // 0 means add number
 
+        Player currentPlayer = players.get(name); //  Get the player's record
+
         //  Step 3: Handle errors returned from `updateBoard()`
         switch (result) {
             case 1:
+                currentPlayer.updatePoints(-2);
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(6)
-                        .setMessage("\n⚠️ Error: You cannot modify a pre-filled number!")
+                        .setMessage("\n⚠️ Error: You cannot modify a pre-filled number! (-2 points)")
                         .setNext(3)  //  Stay in the game
                         .build();
             case 2:
+                currentPlayer.updatePoints(-2);
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
-                        .setMessage("\n⚠️ Error: The number already exists in the row!")
+                        .setMessage("\n⚠️ Error: The number already exists in the row! (-2 points)")
                         .setNext(3)  //  Stay in the game
                         .build();
             case 3:
+                currentPlayer.updatePoints(-2);
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
-                        .setMessage("\n⚠️ Error: The number already exists in the column!")
+                        .setMessage("\n⚠️ Error: The number already exists in the column! (-2 points)")
                         .setNext(3)  //  Stay in the game
                         .build();
             case 4:
+                currentPlayer.updatePoints(-2);
                 return Response.newBuilder()
                         .setResponseType(Response.ResponseType.ERROR)
                         .setErrorType(7)
-                        .setMessage("\n⚠️ Error: The number already exists in the 3x3 grid!")
+                        .setMessage("\n⚠️ Error: The number already exists in the 3x3 grid!  (-2 points)")
                         .setNext(3)  //  Stay in the game
                         .build();
         }
 
-        //  Step 4: Check if the player has won
         if (game.checkWon()) {
+
+            int finalScore = calculateFinalScore(name);
+
+
+            updatePlayerScore(name, finalScore);
+            this.inGame = false;  //  Ensure player exits game mode
+            this.currentState = 2; //  Reset to main menu selection
+
+            System.out.println(" Player has won. Returning to main menu...");
+
             return Response.newBuilder()
                     .setResponseType(Response.ResponseType.WON)
-                    .setMessage("🎉 Congratulations! You completed the Sudoku puzzle! 🎉")
-                    .setMenuoptions(menuOptions) // Back to the main menu
-                    .setNext(2)
+                    .setType(Response.EvalType.UPDATE)
+                    .setMessage("🎉 You solved the current puzzle, good job! 🎉")
+                    .setMenuoptions(menuOptions)  //  Ensure client sees main menu
+                    .setBoard(game.getDisplayBoard())  //  Send final board state
+                    .setPoints(finalScore)  // Send final points
+                    .setNext(2)  //  Ensure transition to main menu
                     .build();
         }
+
 
         //  Step 5: Send updated board
         return Response.newBuilder()
                 .setResponseType(Response.ResponseType.PLAY)
                 .setMessage(game.getDisplayBoard())
                 .setMenuoptions(gameOptions) // In-game menu
-                .setNext(3)  // ✅ Stay in the game
+                .setPoints(currentPlayer.getPoints())
+                .setNext(3)  //  Stay in the game
+                .build();
+    }
+
+    private int calculateFinalScore(String playerName) {
+        Player currentPlayer = players.get(playerName);
+
+        // 🎯 If player doesn't exist yet, start with 0 points
+        if (currentPlayer == null) {
+            return 20; // New players start fresh
+        }
+
+        // 🎯 Calculate new score (start with 20 and deduct penalties)
+        int newScore = Math.max(20 + currentPlayer.getPoints(), 0); // Ensure minimum 0
+
+        // 🎯 Compare with previous high score
+        if (newScore > currentPlayer.getWins()) {
+            System.out.println(" New high score for " + playerName + ": " + newScore);
+            currentPlayer.updateWins(newScore); // Set new high score
+        } else {
+            System.out.println(" Keeping old high score for " + playerName + ": " + currentPlayer.getWins());
+            newScore = currentPlayer.getWins(); // Keep previous high score
+        }
+
+        //  Ensure the player's session score resets for the next game
+        currentPlayer.resetPoints();
+
+        return newScore;
+    }
+
+    private Response startNewBoard() {
+        System.out.println("🔄 Resetting game with difficulty " + lastDifficulty);
+        game = new Game();
+        game.newGame(grading, lastDifficulty); // Use stored difficulty
+
+        int penalty = -5; //  Deduct 5 points for clearing operations
+        Player currentPlayer = players.get(name);
+        currentPlayer.updatePoints(penalty);
+
+        System.out.println(game.getDisplayBoard());
+
+        return Response.newBuilder()
+                .setResponseType(Response.ResponseType.PLAY)
+                .setMessage("🆕 New board generated!\n" + game.getDisplayBoard())
+                .setMenuoptions(gameOptions)
+                .setPoints(currentPlayer.getPoints())
+                .setNext(3)  // Stay in game, don't exit
+                .build();
+    }
+
+
+
+    private Response clearBoard(Request op) {
+        System.out.println("Processing clear request: Row=" + op.getRow() + ", Column=" + op.getColumn() + ", Value=" + op.getValue());
+
+        int penalty = -5; //  Deduct 5 points for clearing operations
+        Player currentPlayer = players.get(name);
+        currentPlayer.updatePoints(penalty);
+
+        boolean success = false;
+        switch (op.getValue()) {
+            case 1:  //  Clear single value
+                success = game.updateBoard(op.getRow() - 1, op.getColumn() - 1, 0, 1) == 0;
+                break;
+            case 2:  //  Clear row
+                success = game.updateBoard(op.getRow() - 1, -1, 0, 2) == 0;
+                break;
+            case 3:  //  Clear column
+                success = game.updateBoard(-1, op.getColumn() - 1, 0, 3) == 0;
+                break;
+            case 4:  //  Clear grid
+                success = game.updateBoard(op.getRow(), -1, 0, 4) == 0;
+                break;
+            case 5:  //  Clear entire board
+                game.resetBoard();
+                success = true;
+                break;
+        }
+
+        if (!success) {
+            return error(7, "Invalid clear operation.");
+        }
+
+        return Response.newBuilder()
+                .setResponseType(Response.ResponseType.PLAY)
+                .setMessage(game.getDisplayBoard())
+                .setMenuoptions(gameOptions)
+                .setPoints(currentPlayer.getPoints()) //  Send updated points
+                .setNext(3)
                 .build();
     }
 
@@ -401,63 +543,65 @@ class SockBaseServer {
      * @param message - type Message from Protobuf which is the message to be written in the log (e.g. Connect)
      * @return String of the new hidden image
      */
+
+
     public synchronized void writeToLog(String name, Message message) {
         try {
-            // read old log file
+            // Read old log file
             Logs.Builder logs = readLogFile();
+            Date date = new Date();
 
-
-            Date date = java.util.Calendar.getInstance().getTime();
-            // Ensure the player exists
+            // Ensure the player exists in memory
             Player player = players.computeIfAbsent(name, k -> new Player(name, 0));
 
-            if (message == Message.CONNECT) {
-               player.incrementLoginCount();
-            }
 
-
-            // Remove any previous log entry of this player
-            logs.getLogList().removeIf(logEntry -> logEntry.contains(" - " + name + " - "));
-
-            // we are writing a new log entry to our log
-            // add a new log entry to the log list of the Protobuf object
-
-
-            // Create log format: "DATE - NAME - WINS: X - LOGINS: Y - ACTION"
-            String logEntry = String.format("%s - %s - Wins: %d - Logins: %d - %s",
+            // Create log format: "DATE - NAME - Wins: X - Logins: Y - ACTION"
+            String newEntry = String.format("%s - %s - Wins: %d - Logins: %d - %s",
                     date, name, player.getWins(), player.getLoginCount(), message);
 
-            // Add new entry
-            logs.addLog(logEntry);
+            // Remove the old log entry if it exists (by filtering the name)
+            List<String> updatedLogs = logs.getLogList().stream()
+                    .filter(logEntry -> !logEntry.contains(" - " + name + " - "))  // Remove old logs for this player
+                    .collect(Collectors.toList());
 
+            // Add the updated entry
+            updatedLogs.add(newEntry);
+            logs.clearLog(); // Clear previous logs
+            logs.addAllLog(updatedLogs); // Add updated logs
 
-            // open log file
-            FileOutputStream output = new FileOutputStream(logFilename);
-            Logs logsObj = logs.build();
-
-            // write to log file
-            logsObj.writeTo(output);
-
-        } catch(Exception e) {
-            System.out.println("Issue while trying to save");
-        }
-    }
-
-
-    public synchronized Logs.Builder readLogFile() throws Exception {
-        synchronized (logLock) {
-            Logs.Builder logs = Logs.newBuilder();
-
-            try {
-                // just read the file and put what is in it into the logs object
-                return logs.mergeFrom(new FileInputStream(logFilename));
-            } catch (FileNotFoundException e) {
-                System.out.println(logFilename + ": File not found.  Creating a new file.");
-                return logs;
+            // Write back to file
+            try (FileOutputStream output = new FileOutputStream(logFilename)) {
+                logs.build().writeTo(output);
             }
+
+            System.out.println("✅ Log saved successfully for: " + name);
+        } catch (Exception e) {
+            System.out.println("⚠️ Issue while trying to save: " + e.getMessage());
         }
     }
 
+
+
+public static synchronized Logs.Builder readLogFile() {
+    synchronized (logLock) {
+        Logs.Builder logs = Logs.newBuilder();
+        File logFile = new File(logFilename);
+
+        if (!logFile.exists()) {
+            System.out.println(logFilename + ": File not found. Creating a new file.");
+            return logs;  // Return empty logs
+        }
+
+        try (FileInputStream input = new FileInputStream(logFile)) {
+            return logs.mergeFrom(input);
+        } catch (IOException e) {
+            System.out.println("⚠️ Issue reading log file: " + e.getMessage());
+        } catch (Exception ex) {
+            System.out.println("❌ Severe issue reading logs: " + ex.getMessage());
+        }
+        return logs;
+    }
+}
 
 
 

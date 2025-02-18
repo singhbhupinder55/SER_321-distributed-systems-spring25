@@ -63,7 +63,7 @@ class SockBaseClient {
                         break;
 
                     case START:
-                        // ✅ Display the board received from the server
+                        //  Display the board received from the server
                         System.out.println("\n================== 🧩 Sudoku Board ==================");
                         System.out.println(response.getMessage());  // This contains the board
                         System.out.println("====================================================");
@@ -71,7 +71,7 @@ class SockBaseClient {
                         System.out.println(response.getMenuoptions());
 
                         int[] move = getValidatedMove();  // Get user input
-                        if (move == null) {  // ✅ If 'exit' was entered, send a QUIT request
+                        if (move == null) {  //  If 'exit' was entered, send a QUIT request
                             req.setOperationType(Request.OperationType.QUIT);
                         } else {
                             req.setOperationType(Request.OperationType.UPDATE);
@@ -86,6 +86,8 @@ class SockBaseClient {
                         System.out.println(response.getMessage());  // Display updated board
                         System.out.println("====================================================");
                         System.out.println(response.getMenuoptions()); // Show in-game menu
+
+                        System.out.println("\n🎯 Current Points: " + response.getPoints());
 
                         // Ask for the next move
                         int[] nextMove = getValidatedMove();
@@ -104,8 +106,11 @@ class SockBaseClient {
                         System.out.println("\n🎉🎉🎉 CONGRATULATIONS! 🎉🎉🎉");
                         System.out.println(response.getMessage());
                         System.out.println("====================================================");
-                        chooseMenu(Request.newBuilder(), response);
-                        return; // Exit game after win
+
+                        System.out.println("\n🏆 Final Score: " + response.getPoints());
+                        req.setOperationType(Request.OperationType.LEADERBOARD);
+                        req.build().writeDelimitedTo(out);
+                        continue;
 
                     case BYE:
                         System.out.println("\n👋 Thank you for playing! Goodbye.");
@@ -186,13 +191,36 @@ class SockBaseClient {
                 return req;
                 // needs to include the other requests
                 case "2":
-                    System.out.print("\nEnter difficulty level (1 - 20): ");
-                    String difficultyStr = stdin.readLine();  // Get difficulty input from use
+                    int difficulty;
+                    while (true) {
+                        System.out.print("\nEnter difficulty level (1 - 20): ");
+                        String difficultyStr = stdin.readLine().trim();
+
+                        try {
+                            difficulty = Integer.parseInt(difficultyStr);
+                            if (difficulty < 1 || difficulty > 20) {
+                                System.out.println("\n⚠️ Error: Difficulty must be between 1-20.");
+                                continue; // Ask again
+                            }
+                            break; // Valid input, exit loop
+                        } catch (NumberFormatException e) {
+                            System.out.println("\n⚠️ Error: Invalid input! Please enter a number.");
+                        }
+                    }
                     req.setOperationType(Request.OperationType.START);
-                    req.setDifficulty(Integer.parseInt(difficultyStr)); // Send difficulty to server
+                   req.setDifficulty(difficulty); // Send difficulty to server
                     return req;
                 case "3":
                     req.setOperationType(Request.OperationType.QUIT);
+                    return req;
+
+                case "4":
+                    req.setOperationType(Request.OperationType.CLEAR);
+                    req.setValue(5); // Value 5 means clearing the board
+                    return req;
+                case "5":
+                    req.setOperationType(Request.OperationType.CLEAR);
+                    req.setValue(6); // Value 6 means getting a new board
                     return req;
 
                 default:
@@ -216,7 +244,8 @@ class SockBaseClient {
      * Handles the clear menu logic when the user chooses that in Game menu. It retuns the values exactly
      * as needed in the CLEAR request row int[0], column int[1], value int[3]
      */
-    static int[] boardSelectionClear() throws Exception {
+    static int[] boardSelectionClear() throws Exception
+    {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
         System.out.println("Choose what kind of clear by entering an integer (1 - 5)");
@@ -420,23 +449,38 @@ class SockBaseClient {
     static int[] getValidatedMove() throws IOException {
         BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
         String input;
-        System.out.println("\n   Enter your move in the format: row column value");
-        System.out.println("   Example: 3 4 7 (to place number 7 at row 3, column 4)");
-        System.out.println("   Row and Column should be between 1 and 9, Value should be between 1 and 9.");
-        System.out.println("   Type 'exit' to quit the game.");
+        System.out.println("\n📌 Instructions:");
+        System.out.println("   - Enter your move in the format: row column value");
+        System.out.println("   - Example: 3 4 7 (to place number 7 at row 3, column 4)");
+        System.out.println("   - Row and Column should be between 1 and 9, Value should be between 1 and 9.");
+        System.out.println("   - Type 'r' for a new board.");
+        System.out.println("   - Type 'cb' to clear the entire board.");
+        System.out.println("   - Type 'exit' to quit the game.");
         System.out.println("==================================================\n");
 
         while (true) {
-            System.out.print("Enter row, column, and value (or 'exit' to quit): \n");
+            System.out.print("Enter row, column, and value(or 'r' for new board, 'cb' to clear board, 'exit' to quit): \n");
             input = stdin.readLine().trim();
 
             if (input.equalsIgnoreCase("exit")) {
                 System.out.println("\n Exiting game... Sending QUIT request.");
+
                 Request quitRequest = Request.newBuilder()
                         .setOperationType(Request.OperationType.QUIT)
                         .build();
+
                 return null;  // Special signal for QUIT
             }
+
+            if (input.equalsIgnoreCase("r")) {
+                System.out.println("\n🔄 Requesting a new board...");
+                return new int[]{-3, -3, -3};  // Special signal for new board
+            }
+            if (input.equalsIgnoreCase("cb")) {
+                System.out.println("\n🧹 Clearing the entire board...");
+                return new int[]{-2, -2, -2};  // Special signal for clearing board
+            }
+
             if (isValidInput(input)) {
                 break;
             }
@@ -451,7 +495,9 @@ class SockBaseClient {
      * Validates the user input for move format correctness.
      */
     static boolean isValidInput(String input) {
-        String[] parts = input.trim().split("\\s+");
+        input = input.trim();
+
+        String[] parts = input.split("\\s+");
         if (parts.length != 3) {
             System.out.println("❌ **Invalid format!** Please enter three numbers separated by spaces (e.g., 3 4 7).");
             return false;
