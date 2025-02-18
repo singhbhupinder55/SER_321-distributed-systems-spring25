@@ -10,4 +10,8 @@ DMon Feb 17 23:58:03 EST 2025 - TAJINDER - Wins: 20 - Logins: 2 - WIN
 @Tue Feb 18 00:01:09 EST 2025 - 2 - Wins: 0 - Logins: 1 - CONNECT
 GTue Feb 18 00:04:15 EST 2025 - MEHLHASE - Wins: 0 - Logins: 1 - CONNECT
 DTue Feb 18 00:22:03 EST 2025 - GRACE - Wins: 0 - Logins: 1 - CONNECT
-@Tue Feb 18 00:59:21 EST 2025 - SINGH - Wins: 8 - Logins: 1 - WIN
+DTue Feb 18 06:13:24 UTC 2025 - SINGH - Wins: 0 - Logins: 2 - CONNECT
+FTue Feb 18 06:18:07 UTC 2025 - STUDENT - Wins: 0 - Logins: 2 - CONNECT
+GTue Feb 18 06:27:54 UTC 2025 - STUDENT3 - Wins: 0 - Logins: 1 - CONNECT
+DTue Feb 18 06:31:26 UTC 2025 - STUDENT2 - Wins: 13 - Logins: 2 - WIN
+DTue Feb 18 06:32:08 UTC 2025 - STUDENT1 - Wins: 20 - Logins: 1 - WIN
