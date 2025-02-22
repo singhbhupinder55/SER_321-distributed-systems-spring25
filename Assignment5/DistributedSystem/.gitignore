@@ -1,0 +1,34 @@
+
+# Ignore build and Gradle-related files
+/build/
+/.gradle/
+/out/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA-specific files
+/.idea/
+/*.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Java compiled files
+*.class
+
+# Test reports and generated files
+/test-results/
+/reports/
+
+# Dependency caches
+/.mvn/
+/target/
+
+# Screencast video (if any)
+*.mp4
+*.mov
+*.avi
+

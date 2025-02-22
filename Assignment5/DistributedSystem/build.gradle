@@ -1,0 +1,35 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'distributed.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.8.9'  // JSON Parsing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'  // JUnit Testing
+}
+
+tasks.register('runLeader', JavaExec) {
+    mainClass = 'distributed.Leader'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.register('runClient', JavaExec) {
+    mainClass = 'distributed.Client'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+tasks.register('runNode', JavaExec) {
+    mainClass = 'distributed.Node'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+test {
+    useJUnitPlatform()
+}
