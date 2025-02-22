@@ -25,9 +25,9 @@ gradle runNode
 This project implements a distributed computation system where:
 - A Client sends a list of numbers and a delay time to the Leader.
 - The Leader:
--- Computes the sum sequentially.
--- Splits the list among Nodes for parallel processing.
--- Verifies correctness using a simple consensus algorithm.
+    - Computes the sum sequentially.
+    - Splits the list among Nodes for parallel processing.
+    - Verifies correctness using a simple consensus algorithm.
 - Nodes compute the sum of their assigned numbers and return results to the Leader.
 
 Note: The goal is to compare sequential vs. distributed computation performance.
