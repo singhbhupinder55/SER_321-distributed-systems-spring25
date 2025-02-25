@@ -179,7 +179,7 @@ The goal is to compare **Sequential Computation vs. Distributed Computation**.
 4. **Displaying Performance Comparison (Sequential vs. Distributed Sum).**
 5. **Explaining Code Structure (Brief Overview of Leader, Node, Client Files).**
 
-[Screencast Link - Click to View](jsagibeiqcab9)
+[Screencast Link - Click to View](https://youtu.be/HQqSBJYcNV0)
 
 
 
@@ -213,11 +213,11 @@ gradle runClient
 ```
 
 #### 📌 Client Output:
-📜 **Final Results from Leader:**
-📌 Sequential Sum: 21.0 (Time: 320ms)
-⚡ Distributed Sum: -22.0 (Time: 135ms)
-📜 Consensus: Failed
-📜 Node Verifications: YES YES NO
+- 📜 **Final Results from Leader:**
+- 📌 Sequential Sum: 21.0 (Time: 320ms)
+- ⚡ Distributed Sum: -22.0 (Time: 135ms)
+- 📜 Consensus: Failed
+- 📜 Node Verifications: YES YES NO
 
 ## 📌 Summary of Features
 
