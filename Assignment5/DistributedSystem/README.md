@@ -77,6 +77,39 @@ The system communicates using **socket-based messaging**.
 | `"Consensus: Passed"`     | All nodes agree on computation result            | Leader → Client  |
 | `"Consensus: Failed"`     | One or more nodes disagreed                      | Leader → Client  |
 
+## 🔍 Consensus Check Example
+
+During the verification step, the **Leader sends different sets of numbers** to each Node to cross-check results.
+
+Example:
+1. **Initial Computation Results:**
+    - Node 1 computes `Sum = 10`
+    - Node 2 computes `Sum = 15`
+    - Node 3 computes `Sum = 20`
+
+2. **Verification Step:**
+    - Leader sends **Node 1's sum (10)** to Node 2 for validation.
+    - Leader sends **Node 2's sum (15)** to Node 3 for validation.
+    - Leader sends **Node 3's sum (20)** to Node 1 for validation.
+
+3. **Node Responses:**
+    - If the sum **matches expected values**, Node responds **YES**.
+    - If a Node detects a mismatch, it responds **NO**.
+
+If **all nodes return YES**, the **Leader confirms a valid computation**.  
+If **at least one node returns NO**, **the consensus fails** and an error is reported.
+
+
+## 🧵 Multi-threading in Leader-Node Communication
+
+The Leader communicates with Nodes using **multi-threading**, ensuring that:
+- Nodes receive their assigned portion of numbers **simultaneously**.
+- Each Node processes its sum independently **without blocking** the Leader.
+- The Leader aggregates results **asynchronously**, reducing processing time.
+
+This ensures that the **distributed computation is truly parallel** rather than sequential.
+
+
 ## ⚙ 4. Workflow Overview
 
 1. **Start the Leader** to manage nodes and computations.
@@ -101,6 +134,23 @@ The system communicates using **socket-based messaging**.
 - Handles faulty nodes via Gradle flag (-pFault=1).
 - Parallel processing using multi-threading.
 
+## ❗ Error Handling
+
+This system includes **robust error handling** to prevent crashes and provide meaningful feedback:
+
+✅ **Client Input Validation:**
+- Ensures users enter valid numbers.
+- Validates that the delay input is a **non-negative integer**.
+
+✅ **Leader Error Handling:**
+- Checks for **at least 3 registered Nodes** before processing.
+- Detects **faulty nodes** and logs incorrect computations.
+- Handles **malformed client requests** gracefully.
+
+✅ **Node Error Handling:**
+- Nodes handle **invalid messages from the Leader** without crashing.
+- Simulated faulty nodes return incorrect sums **intentionally** (for testing).
+
 ## 📊  Performance Analysis
 The goal is to compare **Sequential Computation vs. Distributed Computation**.
 
@@ -120,14 +170,16 @@ The goal is to compare **Sequential Computation vs. Distributed Computation**.
 
 
 
-## Screencast Demonstration
-A video demonstration of the project running will be provided, showcasing:
-- Running the Leader, Client, and Nodes.
-- Sending data from Client → Leader → Nodes.
-- Performing sequential vs. distributed computation.
-- Handling faulty nodes and consensus checking.
+## 🎥 Screencast Demonstration 
 
-[Screencast Link](jsagibeiqcab9)
+### 🎬 **What the Screencast Should Show:**
+1. **Starting the Leader, Nodes, and Client in Order**.
+2. **Performing a Normal Computation (No Faults)**.
+3. **Introducing a Faulty Node and Showing Consensus Failure**.
+4. **Displaying Performance Comparison (Sequential vs. Distributed Sum).**
+5. **Explaining Code Structure (Brief Overview of Leader, Node, Client Files).**
+
+[Screencast Link - Click to View](jsagibeiqcab9)
 
 
 
@@ -173,9 +225,10 @@ gradle runClient
 - ✅ Client sends computation requests and displays results.
 - ✅ Nodes compute partial sums and return results.
 - ✅ Leader performs sequential and distributed computation.
-- ✅ Fault injection allows testing of faulty nodes.
-- ✅ Consensus check ensures computation correctness.
-- ✅ Multi-threaded execution enables parallel computation.
-- ✅ Leader detects faulty nodes and informs the client.
+- ✅ **Multi-threaded execution ensures parallel computation.**
+- ✅ **Leader implements a consensus algorithm to verify correctness.**
+- ✅ **Fault injection allows testing of faulty nodes.**
+- ✅ **Comprehensive error handling prevents crashes and invalid data.**
+- ✅ **Screencast demonstration showcases full functionality.**
 
 --
