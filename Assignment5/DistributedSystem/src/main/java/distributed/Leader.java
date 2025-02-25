@@ -107,20 +107,46 @@ public class Leader {
                 System.out.println(" Node " + (i + 1) + " will process: " + partitions.get(i));
             }
 
-            //Measure time for sequential computation
+            // step 1: Measure time for sequential computation
             long startTime = System.currentTimeMillis(); // Start timer
             double sequentialSum = computeSequentialSum(numbers, delay);
             long sequentialTime = System.currentTimeMillis() - startTime; // End timer
             System.out.println("⏳ Sequential Computation Time: " + sequentialTime + "ms");
 
-            //Measure time for distributed computation**
+            //step 2 : Measure time for distributed computation**
             startTime = System.currentTimeMillis(); // Start timer
             double distributedSum = computeDistributedSum(numbers, delay);
             long distributedTime = System.currentTimeMillis() - startTime; // End timer
             System.out.println("⚡ Distributed Computation Time: " + distributedTime + "ms");
 
+            // step 3: Run Consensus Verification
+            //boolean consensusPassed = runConsensus();
+            String consensusResult = runConsensus();
+            String[] consensusParts = consensusResult.split(";"); // Extract YES/NO results
+
+            String consensusStatus = consensusParts[0].trim();
+            String verificationResults = consensusParts.length > 1 ? consensusParts[1].trim() : "Unknown";
+
             out.println(" Sequential Sum: " + sequentialSum + " (Time: " + sequentialTime + "ms), " +
-                    "Distributed Sum: " + distributedSum + " (Time: " + distributedTime + "ms)");
+                    "Distributed Sum: " + distributedSum + " (Time: " + distributedTime + "ms), " +
+                    "Consensus: " + (consensusStatus.equals("YES") ? "Passed" : "Failed") + ", " +
+                    "Node Verifications: " + verificationResults);
+
+/*
+            // step 4: Send final response based on consensus
+            if (consensusPassed) {
+                out.println(" Sequential Sum: " + sequentialSum + " (Time: " + sequentialTime + "ms), " +
+                        "Distributed Sum: " + distributedSum + " (Time: " + distributedTime + "ms), " +
+                        "Consensus: Passed");
+            } else {
+                out.println(" Sequential Sum: " + sequentialSum + " (Time: " + sequentialTime + "ms), " +
+                        "Distributed Sum: " + distributedSum + " (Time: " + distributedTime + "ms), " +
+                        "Consensus: Failed");
+            }
+
+ */
+
+
         } catch (Exception e) {
             e.printStackTrace();
             out.println(" Error processing request.");
@@ -139,6 +165,48 @@ public class Leader {
             Thread.currentThread().interrupt();
         }
         return sum;
+    }
+
+
+    private static String runConsensus() {
+        System.out.println("🔍 Running Consensus Check...");
+
+        ExecutorService consensusExecutor = Executors.newFixedThreadPool(connectedNodes.size());
+        List<Future<String>> responses = new ArrayList<>();
+
+        for (int i = 0; i < connectedNodes.size(); i++) {
+            final int nodeIndex = i;
+            responses.add(consensusExecutor.submit(() -> {
+                Socket nodeSocket = connectedNodes.get(nodeIndex);
+                String verificationData = "VERIFY";  // **STEP 4: Send verification request**
+                return sendToNode(nodeSocket, verificationData);
+            }));
+        }
+
+
+
+
+        boolean allAgree = true;
+        StringBuilder consensusResults = new StringBuilder(); // Store YES/NO results
+        for (Future<String> future : responses) {
+            try {
+                String response = future.get();
+                System.out.println("📩 Node response: " + response);
+                consensusResults.append(response).append(" "); // Store results for Client
+                if (!response.equals("YES")) {
+                    allAgree = false;
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                allAgree = false;
+                consensusResults.append("ERROR "); // Mark error
+            }
+        }
+
+        consensusExecutor.shutdown();
+        //return allAgree;
+        return allAgree ? "YES; " + consensusResults.toString().trim() : "NO; " + consensusResults.toString().trim();
     }
 
 

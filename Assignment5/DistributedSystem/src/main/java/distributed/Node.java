@@ -26,19 +26,23 @@ public class Node {
                 System.out.println("📩 Received from Leader: " + request);
 
                 String[] parts = request.split(";");
-                int sum = computeSum(parts[0], Integer.parseInt(parts[1]));
 
-                // Introduce Fault if enabled
-                if (IS_FAULTY) {
-                    sum = introduceFault(sum);
-                    System.out.println("️ Faulty Node Active! Sending incorrect sum: " + sum);
+                if (request.equals("VERIFY")) {
+                    out.println(runVerification());
                 } else {
-                    System.out.println(" Correct sum computed: " + sum);
-                }
+                    int sum = computeSum(parts[0], Integer.parseInt(parts[1]));
+                    // Introduce Fault if enabled
+                    if (IS_FAULTY) {
+                        sum = introduceFault(sum);
+                        System.out.println("️ Faulty Node Active! Sending incorrect sum: " + sum);
+                    } else {
+                        System.out.println(" Correct sum computed: " + sum);
+                    }
 
-                // ✅ **Debug: Print the computed sum before sending**
-                System.out.println("📤 Sending computed sum: " + sum);
-                out.println(sum);
+                    // ✅ **Debug: Print the computed sum before sending**
+                    System.out.println("📤 Sending computed sum: " + sum);
+                    out.println(sum);
+                }
             }
 
             socket.close();
@@ -55,20 +59,26 @@ public class Node {
                 Thread.sleep(delay);
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            System.out.println(" Error computing sum");
+            //Thread.currentThread().interrupt();
         }
         return sum;
     }
 
     private static int introduceFault(int correctSum) {
         Random random = new Random();
-        int faultType = random.nextInt(3); // Generate a random fault type (0, 1, 2)
-
+        int faultType = random.nextInt(3);
         switch (faultType) {
-            case 0: return correctSum + random.nextInt(50) + 1; // Add a random number (1-50)
-            case 1: return correctSum - random.nextInt(50) - 1; // Subtract a random number (1-50)
-            case 2: return correctSum * (random.nextInt(3) + 1); // Multiply by 1, 2, or 3
-            default: return correctSum; // Should never reach here
+            case 0: return correctSum + random.nextInt(50) + 1;
+            case 1: return correctSum - random.nextInt(50) - 1;
+            case 2: return correctSum * (random.nextInt(3) + 1);
+            default: return correctSum;
         }
     }
+
+
+    private static String runVerification() {
+        return IS_FAULTY ? "NO" : "YES"; // If node is faulty, it disagrees
+    }
+
 }
