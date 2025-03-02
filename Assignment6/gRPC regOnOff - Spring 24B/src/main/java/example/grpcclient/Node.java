@@ -39,6 +39,7 @@ public class Node {
         .addService(new JokeImpl())
         .addService(new RegistryAnswerImpl(services))
         .addService(new WeightTrackerImpl()) // Register WeightTracker service
+        .addService(new FollowServiceImpl()) // Added Follow Service
          .build().start();
 
     for (var service : server.getServices()) {

@@ -34,14 +34,16 @@ protobuf {
         artifact = 'com.google.protobuf:protoc:3.21.1'
     }
     plugins {
-      grpc {
-        artifact = 'io.grpc:protoc-gen-grpc-java:1.49.1'
-      }
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.49.1'
+        }
     }
     generateProtoTasks {
-      all()*.plugins {
-        grpc {}
-      }
+        all().each { task ->
+            task.plugins {
+                grpc {}
+            }
+        }
     }
 }
 
@@ -158,6 +160,12 @@ task runClient(type: JavaExec) {
   args grpcPort
   args message 
   args regOn
+    // Pass the auto mode flag if provided
+    if (project.hasProperty("auto")) {
+        args project.getProperty("auto")
+    } else {
+        args "0" // Default to "0" if not set
+    }
 }
 
 // runs a service node which already has the echo and joke service included
@@ -186,4 +194,4 @@ task runNode(type: JavaExec) {
 // gradle runNode -PnodeName="amehlhas" -PgrpcPort=8080 -PregistryHost="ser321test.duckdns.org" -PserviceHost="18.220.233.57" -PdiscoveryPort=8888 -PservicePort=8880
 
 // on my local machine
-//gradle runClientJava -PgrpcPort=8080 -PregistryHost="ser321test.duckdns.org" -PserviceHost="18.220.233.57" -PservicePort=8880
+ //gradle runClientJava -PgrpcPort=8080 -PregistryHost="ser321test.duckdns.org" -PserviceHost="18.220.233.57" -PservicePort=8880

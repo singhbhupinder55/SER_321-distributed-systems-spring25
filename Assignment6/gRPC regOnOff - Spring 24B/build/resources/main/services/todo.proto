@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "service";
+option java_outer_classname = "ToDoListProto";
+
+package services;
+
+service ToDoList {
+  rpc AddTask (TaskRequest) returns (TaskResponse) {}
+  rpc GetTasks (UserRequest) returns (TaskListResponse) {}
+  rpc CompleteTask (TaskUpdateRequest) returns (TaskResponse) {}
+}
+
+// Request to add a new task
+message TaskRequest {
+  string user = 1;
+  string taskDescription = 2;
+}
+
+// Response for adding/completing a task
+message TaskResponse {
+  bool isSuccess = 1;
+  string message = 2;
+}
+
+// Request to get tasks for a user
+message UserRequest {
+  string user = 1;
+}
+
+// Response containing a list of tasks
+message TaskListResponse {
+  bool isSuccess = 1;
+  repeated Task tasks = 2;
+}
+
+// Request to mark a task as completed
+message TaskUpdateRequest {
+  string user = 1;
+  int32 taskId = 2;
+}
+
+// Task details
+message Task {
+  int32 id = 1;
+  string description = 2;
+  bool isCompleted = 3;
+}

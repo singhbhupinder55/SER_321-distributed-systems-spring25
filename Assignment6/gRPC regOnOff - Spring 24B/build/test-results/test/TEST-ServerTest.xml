@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="ServerTest" tests="2" skipped="0" failures="2" errors="0" timestamp="2025-03-01T16:40:27" hostname="Third-MacBook-Pro.local" time="0.138">
+<testsuite name="ServerTest" tests="2" skipped="0" failures="2" errors="0" timestamp="2025-03-02T06:59:30" hostname="Mac.attlocal.net" time="0.138">
   <properties/>
-  <testcase name="parrot" classname="ServerTest" time="0.135">
+  <testcase name="parrot" classname="ServerTest" time="0.134">
     <failure message="io.grpc.StatusRuntimeException: UNAVAILABLE: io exception" type="io.grpc.StatusRuntimeException">io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
 	at app//io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:262)
 	at app//io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:243)
@@ -63,7 +63,7 @@ Caused by: java.net.ConnectException: Connection refused
 	at java.base/java.lang.Thread.run(Thread.java:1575)
 </failure>
   </testcase>
-  <testcase name="joke" classname="ServerTest" time="0.003">
+  <testcase name="joke" classname="ServerTest" time="0.004">
     <failure message="io.grpc.StatusRuntimeException: UNAVAILABLE: io exception" type="io.grpc.StatusRuntimeException">io.grpc.StatusRuntimeException: UNAVAILABLE: io exception
 	at app//io.grpc.stub.ClientCalls.toStatusRuntimeException(ClientCalls.java:262)
 	at app//io.grpc.stub.ClientCalls.getUnchecked(ClientCalls.java:243)

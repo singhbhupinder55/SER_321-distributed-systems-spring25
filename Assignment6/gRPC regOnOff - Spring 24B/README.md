@@ -101,3 +101,48 @@ To run in IDE:
 - [TO BE ADDED](saxasx) - A video showcasing the project in action.
 - 
   
+
+## Task 1: Starting Your Services Locally
+###  Task 1 Description
+Task 1 required us to analyze, understand, and run the given code, then implement additional gRPC services based on the provided .proto files.
+- We successfully implemented:
+  - Weight Tracker Service (Allows users to track and retrieve their weight data)
+  - Follow Service (Manages user relationships, allowing users to follow each other)
+
+### How Task 1 Works
+The system follows this flow:
+- The Node Server starts and runs the implemented gRPC services.
+- The Client connects to the server and allows users to interact with available services.
+- Users can track weight data or follow other users via a menu-based system.
+- The Auto Mode (gradle runClient -Pauto=1) runs automated tests to verify functionality.
+
+
+### Implemented Services
+#### Weight Tracker Service
+- Users can add weight entries with a timestamp.
+- Retrieve weight history for a given user.
+- Calculate BMI based on user input.
+- Ensures error handling (e.g., invalid weight input, nonexistent user data).
+
+#### Weight Tracker Commands:
+1. Add Weight
+2. Get Weight History
+3. Calculate BMI
+4. Exit to Main Menu
+
+#### Follow Service
+- Users can add themselves to the system.
+- Follow another user (ensuring case-insensitive uniqueness).
+- Retrieve list of users they are following.
+- Prevents users from following a nonexistent user or following the same user twice.
+
+#### Follow Service Commands:
+1. Add User
+2. Follow a User
+3. View Following List
+4. Exit to Main Menu
+
+
+
+
+
