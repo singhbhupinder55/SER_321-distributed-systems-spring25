@@ -27,6 +27,7 @@ dependencies {
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
     implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.18.0'
     implementation "junit:junit:4.12"
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 protobuf {
@@ -39,13 +40,11 @@ protobuf {
         }
     }
     generateProtoTasks {
-        all().each { task ->
-            task.plugins {
-                grpc {}
+        all()*.plugins {
+            grpc {}
             }
         }
     }
-}
 
 sourceSets {
     main {

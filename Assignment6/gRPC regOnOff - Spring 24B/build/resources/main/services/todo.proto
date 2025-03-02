@@ -33,6 +33,7 @@ message UserRequest {
 message TaskListResponse {
   bool isSuccess = 1;
   repeated Task tasks = 2;
+  string message = 3;
 }
 
 // Request to mark a task as completed

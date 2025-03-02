@@ -57,17 +57,18 @@ public final class ToDoListProto {
       "equest\022\014\n\004user\030\001 \001(\t\022\027\n\017taskDescription\030" +
       "\002 \001(\t\"2\n\014TaskResponse\022\021\n\tisSuccess\030\001 \001(\010" +
       "\022\017\n\007message\030\002 \001(\t\"\033\n\013UserRequest\022\014\n\004user" +
-      "\030\001 \001(\t\"D\n\020TaskListResponse\022\021\n\tisSuccess\030" +
-      "\001 \001(\010\022\035\n\005tasks\030\002 \003(\0132\016.services.Task\"1\n\021" +
-      "TaskUpdateRequest\022\014\n\004user\030\001 \001(\t\022\016\n\006taskI" +
-      "d\030\002 \001(\005\"<\n\004Task\022\n\n\002id\030\001 \001(\005\022\023\n\013descripti" +
-      "on\030\002 \001(\t\022\023\n\013isCompleted\030\003 \001(\0102\316\001\n\010ToDoLi" +
-      "st\022:\n\007AddTask\022\025.services.TaskRequest\032\026.s" +
-      "ervices.TaskResponse\"\000\022?\n\010GetTasks\022\025.ser" +
-      "vices.UserRequest\032\032.services.TaskListRes" +
-      "ponse\"\000\022E\n\014CompleteTask\022\033.services.TaskU" +
-      "pdateRequest\032\026.services.TaskResponse\"\000B\032" +
-      "\n\007serviceB\rToDoListProtoP\001b\006proto3"
+      "\030\001 \001(\t\"U\n\020TaskListResponse\022\021\n\tisSuccess\030" +
+      "\001 \001(\010\022\035\n\005tasks\030\002 \003(\0132\016.services.Task\022\017\n\007" +
+      "message\030\003 \001(\t\"1\n\021TaskUpdateRequest\022\014\n\004us" +
+      "er\030\001 \001(\t\022\016\n\006taskId\030\002 \001(\005\"<\n\004Task\022\n\n\002id\030\001" +
+      " \001(\005\022\023\n\013description\030\002 \001(\t\022\023\n\013isCompleted" +
+      "\030\003 \001(\0102\316\001\n\010ToDoList\022:\n\007AddTask\022\025.service" +
+      "s.TaskRequest\032\026.services.TaskResponse\"\000\022" +
+      "?\n\010GetTasks\022\025.services.UserRequest\032\032.ser" +
+      "vices.TaskListResponse\"\000\022E\n\014CompleteTask" +
+      "\022\033.services.TaskUpdateRequest\032\026.services" +
+      ".TaskResponse\"\000B\032\n\007serviceB\rToDoListProt" +
+      "oP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -96,7 +97,7 @@ public final class ToDoListProto {
     internal_static_services_TaskListResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_services_TaskListResponse_descriptor,
-        new java.lang.String[] { "IsSuccess", "Tasks", });
+        new java.lang.String[] { "IsSuccess", "Tasks", "Message", });
     internal_static_services_TaskUpdateRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_services_TaskUpdateRequest_fieldAccessorTable = new

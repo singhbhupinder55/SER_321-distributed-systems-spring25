@@ -98,8 +98,8 @@ To run in IDE:
 
 ## Screencast Demonstration
 
-- [TO BE ADDED](saxasx) - A video showcasing the project in action.
-- 
+- [TO BE ADDED]("The screencast will be uploaded before submission to demonstrate the functionality of all services") 
+- A video showcasing the project in action.
   
 
 ## Task 1: Starting Your Services Locally
@@ -141,6 +141,66 @@ The system follows this flow:
 2. Follow a User
 3. View Following List
 4. Exit to Main Menu
+
+
+## Task 2 : Inventing your own service 
+### Overview
+This project implements a To-Do List Service using gRPC. The service allows users to:
+- Add tasks to their personal list.
+- View tasks assigned to them.
+- Mark tasks as completed.
+- Store tasks persistently using a JSON file. 
+- The implementation includes proper error handling, user validation, and data persistence to ensure a smooth user experience.
+
+### Features
+
+1. Add a Task
+ - Users can add tasks to their personal to-do list.
+ - Tasks are assigned a unique ID starting from 1.
+ - Tasks are saved persistently.
+
+2. View Tasks
+ - Users can retrieve their list of tasks.
+ - If the user does not exist, an error message is displayed.
+ - Tasks are displayed in a numbered format (starting from 1).
+
+3. Mark Task as Completed
+-  Users can mark a task as completed only if it’s not already marked.
+ - If a user selects an already completed task, the system will notify them.
+ - Users are shown their list of tasks before selecting one to complete.
+
+4.  Data Persistence
+ - Tasks are saved to a JSON file (tasks.json).
+ - Upon restart, tasks are loaded from storage.
+ - The persistence system ensures data is not lost between sessions.
+
+### Testing Instructions
+1. Run the server (gradle runServer).
+``` sh
+ gradle runNode
+```
+2. Run the client (gradle runClient).
+``` sh
+ gradle runClient
+```
+3. Navigate the menu options:
+ - Add tasks
+ - View tasks
+ - Complete tasks
+ - Verify persistence by restarting the client/server
+4. Try edge cases (e.g., marking already completed tasks, viewing non-existent users, invalid inputs).
+
+### Summary
+This To-Do List gRPC service implements a fully functional and persistent task manager. It fulfills all the necessary requirements by:
+ - Supporting three distinct gRPC requests.
+ - Handling error conditions properly.
+ - Ensuring persistent data storage using a JSON file.
+ - Providing a user-friendly interface with numbered tasks.
+
+
+
+
+
 
 
 

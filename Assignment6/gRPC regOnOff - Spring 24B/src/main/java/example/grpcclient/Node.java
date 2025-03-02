@@ -40,6 +40,8 @@ public class Node {
         .addService(new RegistryAnswerImpl(services))
         .addService(new WeightTrackerImpl()) // Register WeightTracker service
         .addService(new FollowServiceImpl()) // Added Follow Service
+        .addService(new ToDoListServiceImpl())  // Register ToDoList Service
+
          .build().start();
 
     for (var service : server.getServices()) {

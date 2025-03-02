@@ -36,4 +36,16 @@ public interface TaskListResponseOrBuilder extends
    */
   service.TaskOrBuilder getTasksOrBuilder(
       int index);
+
+  /**
+   * <code>string message = 3;</code>
+   * @return The message.
+   */
+  java.lang.String getMessage();
+  /**
+   * <code>string message = 3;</code>
+   * @return The bytes for message.
+   */
+  com.google.protobuf.ByteString
+      getMessageBytes();
 }

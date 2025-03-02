@@ -23,6 +23,7 @@ public class Client {
   private final RegistryGrpc.RegistryBlockingStub blockingStub4;
   private final WeightTrackerGrpc.WeightTrackerBlockingStub weightStub;
   private final FollowGrpc.FollowBlockingStub followStub;
+  private final ToDoListGrpc.ToDoListBlockingStub todoStub;
 
   /** Construct client for accessing server using the existing channel. */
   public Client(Channel channel, Channel regChannel) {
@@ -38,6 +39,7 @@ public class Client {
     blockingStub4 = RegistryGrpc.newBlockingStub(channel);
     weightStub = WeightTrackerGrpc.newBlockingStub(channel);  // newly added
     followStub = FollowGrpc.newBlockingStub(channel);
+    todoStub = ToDoListGrpc.newBlockingStub(channel);
   }
 
   /** Construct client for accessing server using the existing channel. */
@@ -54,6 +56,7 @@ public class Client {
     blockingStub4 = null;
     weightStub = WeightTrackerGrpc.newBlockingStub(channel);   // newly added
     followStub = FollowGrpc.newBlockingStub(channel);
+    todoStub = ToDoListGrpc.newBlockingStub(channel);
   }
 
   public void askServerToParrot(String message) {
@@ -471,6 +474,94 @@ public class Client {
 
 
 
+  public void interactWithToDoList() {
+    Scanner scanner = new Scanner(System.in);
+
+    while (true) {
+      System.out.println("\n📋 To-Do List Options:");
+      System.out.println("1. Add Task");
+      System.out.println("2. View Tasks");
+      System.out.println("3. Complete a Task");
+      System.out.println("4. Exit to Main Menu");
+      System.out.print("Select an option: ");
+
+      int choice = getUserChoice(scanner, 1, 4);
+
+      if (choice == 1) {
+        System.out.print("Enter your username: ");
+        String username = scanner.next();
+        scanner.nextLine();  // Consume newline
+
+        System.out.print("Enter task description: ");
+        String description = scanner.nextLine();
+
+        TaskRequest request = TaskRequest.newBuilder()
+                .setUser(username)
+                .setTaskDescription(description)
+                .build();
+
+        TaskResponse response = todoStub.addTask(request);
+        System.out.println(response.getMessage());
+      }
+
+      else if (choice == 2) {
+        System.out.print("Enter your username: ");
+        String username = scanner.next();
+
+        UserRequest request = UserRequest.newBuilder().setUser(username).build();
+        TaskListResponse response = todoStub.getTasks(request);
+
+        if (response.getIsSuccess()) {
+          System.out.println("📜 Your Tasks:");
+          for (Task task : response.getTasksList()) {
+            System.out.println(task.getId() + ". " + task.getDescription() + " [" + (task.getIsCompleted() ? "✅" : "❌") + "]");
+          }
+        } else {
+          System.out.println(response.getMessage());  // Now shows "User not found"
+        }
+
+      }
+
+      else if (choice == 3) {
+        System.out.print("Enter your username: ");
+        String username = scanner.next();
+
+        // Fetch tasks before asking for task number
+        UserRequest request = UserRequest.newBuilder().setUser(username).build();
+        TaskListResponse response = todoStub.getTasks(request);
+
+        if (!response.getIsSuccess() || response.getTasksList().isEmpty()) {
+          System.out.println("No tasks found.");
+          return;
+        }
+
+        System.out.println("\n📜 Your Tasks:");
+        for (Task task : response.getTasksList()) {
+          String status = task.getIsCompleted() ? "✅" : "❌";
+          System.out.println(task.getId() + ". " + task.getDescription() + " " + status);
+        }
+
+        System.out.print("Select task number to mark as done: ");
+        int taskId = getUserChoice(scanner, 1, response.getTasksList().size());
+
+        TaskUpdateRequest updateRequest = TaskUpdateRequest.newBuilder()
+                .setUser(username.toLowerCase())
+                .setTaskId(taskId) // No need to adjust index, already 1-based
+                .build();
+
+        TaskResponse updateResponse = todoStub.completeTask(updateRequest);
+        System.out.println(updateResponse.getMessage());
+      }
+
+
+      else if (choice == 4) {
+        System.out.println("Exiting To-Do List and returning to Main Menu...");
+        return;
+      }
+    }
+  }
+
+
 
   public static void main(String[] args) throws Exception {
     if (args.length < 6) {
@@ -549,13 +640,15 @@ public class Client {
           System.out.println("\nMain Menu:");
           System.out.println("1. Weight Tracker");
           System.out.println("2. Follow Service");
-          System.out.println("3. Exit");
+          System.out.println("3. To-Do List Service");
+          System.out.println("4. Exit");
           System.out.print("Select an option: ");
 
-          int option = client.getUserChoice(scanner, 1, 3);
+          int option = client.getUserChoice(scanner, 1, 4);
 
           if (option == 1) client.interactWithWeightTracker();
           else if (option == 2) client.interactWithFollowService();
+          else if (option == 3) client.interactWithToDoList();
           else {
             System.out.println("Exiting Client...");
             break;
