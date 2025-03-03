@@ -1,26 +1,23 @@
 # GRPC Services and Registry
+This project implements a distributed system using gRPC, where:
+- A Registry Server allows service nodes to register and clients to discover available services.
+- Multiple Service Nodes provide different functionalities such as Weight Tracking, Follow System, and To-Do List Management.
+- A Client can query the registry, select a service dynamically, and interact with it.
+- A second client (Client2) enhances dynamic service discovery by fetching available services from the registry and allowing users to choose which service to interact with.
 
-The following folder contains a Registry.jar which includes a Registering service where Nodes can register to allow clients to find them and use their implemented GRPC services. 
-
-Some more detailed explanations will follow and please also check the build.gradle file
-
-
-## Project Overview
-This project implements a distributed system using gRPC. The system consists of:
-- A Registry Server that allows nodes to register and discover services.
-- Multiple Service Nodes that provide different functionalities.
-- A Client that can interact with the registered services.
 
 ## Features Implemented
-Two gRPC services from the provided .proto files.
-- A custom-designed gRPC service.
-- Dynamic service discovery using the Registry.
-- A Client2 that queries the registry and dynamically selects services.
-- Robust error handling to prevent crashes.
+Implemented two gRPC services from the provided .proto files:
+- Weight Tracker Service (Tracks weight history and calculates BMI)
+- Follow Service (Manages user relationships) 
+- Designed and implemented a custom To-Do List gRPC Service 
+- Dynamic service discovery using the Registry Server 
+- Created Client2 to interact with the registry dynamically  
+- Ensured robust error handling to prevent client crashes
 
 
 ## Run things locally without registry
-To run see also video. To run locally and without Registry which you should do for the beginning
+ To run locally and without Registry which you should do for the beginning
 
 First Terminal
 
@@ -44,6 +41,26 @@ Third Terminal
 
     gradle runClient -PregOn=true
 
+### Running the Program with the Registry Server
+This enables service discovery where nodes register and clients dynamically fetch available services.
+
+Steps:
+- Terminal 1: Start the Registry Server
+```sh
+gradle runRegistryServer
+```
+- Terminal 2: Start a Node and Register it
+```sh
+gradle runNode -PregOn=true
+```
+- Terminal 3: Start the Client with Registry Enabled
+```sh
+gradle runClient -PregOn=true
+```
+Terminal 4: Run Client2 for Dynamic Service Selection
+```sh
+gradle runClient2
+```
 
 ### gradle runRegistryServer
 Will run the Registry node on localhost (arguments are possible see gradle). This node will run and allows nodes to register themselves. 
@@ -87,18 +104,20 @@ To run in IDE:
   gradle runClient -Phost=host -Pport=port -Pauto=1
 ```
 
+- or 
+- gradle runClient -Pauto=1
+
 ## Requirements Fulfilled
 - Implemented two gRPC services from .proto files. 
 - Designed and implemented a custom gRPC service. 
 - Ensured the client dynamically discovers services via the registry. 
 - Created Client2 to interact with the registry dynamically. 
 - Ensured the system is robust and does not crash. 
-- Included a structured and detailed README file. 
-- Screencast (to be added before submission).
+- Included a structured and detailed README file.
 
 ## Screencast Demonstration
 
-- [TO BE ADDED]("The screencast will be uploaded before submission to demonstrate the functionality of all services") 
+- [Assignment6](https://youtu.be/WsRofYuRr8M) 
 - A video showcasing the project in action.
   
 
@@ -189,6 +208,19 @@ This project implements a To-Do List Service using gRPC. The service allows user
  - Complete tasks
  - Verify persistence by restarting the client/server
 4. Try edge cases (e.g., marking already completed tasks, viewing non-existent users, invalid inputs).
+
+
+### Task 3.1: Registering Services Locally
+This task involved modifying Client2 to dynamically discover and connect to services via the Registry.
+- Steps Completed
+ - Created Client2.java to interact with the Registry. 
+ - Verified that the Registry receives and registers nodes correctly.
+ - Modified Client2 to fetch, list, and connect to registered services.
+ - Implemented robust error handling to prevent crashes.
+Commands to Run Client2
+```sh
+gradle runClient2
+```
 
 ### Summary
 This To-Do List gRPC service implements a fully functional and persistent task manager. It fulfills all the necessary requirements by:
