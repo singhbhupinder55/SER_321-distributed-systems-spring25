@@ -167,6 +167,18 @@ task runClient(type: JavaExec) {
     }
 }
 
+// runs Client2 which dynamically finds and connects to services via the registry
+task runClient2(type: JavaExec) {
+    dependsOn arguments
+    classpath = sourceSets.main.runtimeClasspath
+    description = "Run Client2 (Registry-Aware)"
+    main = 'example.grpcclient.Client2'  // Ensure this matches the package path in your project
+    standardInput = System.in
+    // default args
+    args registryHost
+    args grpcPort
+}
+
 // runs a service node which already has the echo and joke service included
 task runNode(type: JavaExec) {
   dependsOn arguments
